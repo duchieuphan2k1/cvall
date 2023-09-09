@@ -1,6 +1,7 @@
 from flask import (Flask, flash, Response, render_template, request, redirect, session, url_for, send_file)
 from utils.handle_config import ConfigHandler
 from utils.handle_path import PathHandler
+from utils.handle_dataset import DatasetHandler
 from damo_yolo2.tools.demo import InferRunner
 import os
 from werkzeug.utils import secure_filename
@@ -12,6 +13,7 @@ cfg_handle = ConfigHandler()
 general_cfg = cfg_handle.get_general_config()
 
 path_handler = PathHandler()
+dataset_handler = DatasetHandler()
 
 @app.route("/")
 def home():
@@ -31,11 +33,32 @@ def check_dataset_name():
 
 @app.route("/add_new_dataset", methods=["POST"])
 def add_new_dataset():
-    dataset_name = request.form.get("dataset_name")
-    all_datasets = os.listdir(general_cfg.path.datasets_dir)
-    if dataset_name in all_datasets:
-        return 'false'
-    return 'true'
+    if request.method == 'POST':
+        class_list = []
+        for key in request.form:
+            if 'class' in key:
+                class_list.append(request.form.get(key))
+        if len(class_list) == 0:
+            class_list.append("any")
+
+        dataset_secarino = request.form.get("dataset_secarino")
+        dataset_name = request.form.get("dataset_name")
+        dataset_type = request.form.get("dataset_type")
+        dataset_decs = request.form.get("dataset_decs")
+        dataset_handler.create_dataset(dataset_name, dataset_secarino, dataset_type, dataset_decs, class_list)
+    
+    return redirect('/data')
+
+@app.route('/delete_dataset', methods=["POST"])
+def delete_dataset():
+    if request.method == 'POST':
+        dataset_name = request.form.get("dl_dataset")
+        dataset_handler.delete_dataset(dataset_name)
+    return redirect("/data")
+
+@app.route("/get_all_datasets", methods=["POST", "GET"])
+def get_all_datasets():
+    return dataset_handler.get_all_info()
 
 @app.route("/train")
 def train():

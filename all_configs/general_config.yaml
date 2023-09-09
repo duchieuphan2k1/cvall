@@ -2,6 +2,8 @@ path:
   datasets_dir: datasets
   demo_dir_name: demo_stuff
   demo_output_name: predicted
+  image_dir_name: images
+  dataset_info_file: dataset_info.yaml
 
   models_dir: models
   model_ckpt_name: ckpt

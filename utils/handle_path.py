@@ -49,3 +49,17 @@ class PathHandler:
         if not os.path.exists(path):
             os.mkdir(path)
         return path
+
+    def get_dataset_path_by_name(self, dataset_name):
+        path = os.path.join(self.general_config.path.datasets_dir, dataset_name)
+        return path
+    
+    def get_image_path_by_name(self, dataset_name):
+        dataset_path = self.get_dataset_path_by_name(dataset_name)
+        path = os.path.join(dataset_path, self.general_config.path.image_dir_name)
+        return path
+    
+    def get_dataset_info_path_by_name(self, dataset_name):
+        dataset_path = self.get_dataset_path_by_name(dataset_name)
+        path = os.path.join(dataset_path, self.general_config.path.dataset_info_file)
+        return path

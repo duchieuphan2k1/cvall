@@ -48,6 +48,10 @@
                                 <option value="test">Test</option>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label for="dataset_decs" class="form-label">Dataset Description</label>
+                            <textarea name="dataset_decs" type="text" class="form-control" id="dataset_decs"></textarea>
+                        </div>
                         <div name="dataset_classes" id="dataset_classes" class="mb-3">
                             <label for="dataset_classes">Classes</label>
                             <input onclick="add_train_class()" class="btn btn-primary" type="button"
@@ -65,14 +69,14 @@
         </div>
     </div>
     <br>
-    <table id="dataset_table" class="display">
+    <table id="dataset_table" class="display" style="width: 100%;">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Dataset Name</th>
                 <th>Type</th>
                 <th>Description</th>
                 <th>Preparation Progress</th>
+                <th>Created Date</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -83,10 +87,42 @@
         var class_i = 0;
         $("#data_preparation_link").addClass("active");
         $("#create_dataset_progress").addClass("active");
+        // $(document).ready(function () {
+        //     $('#dataset_table').DataTable();
+        // });
         $(document).ready(function () {
-            $('#dataset_table').DataTable();
+            fetch('/get_all_datasets').then(response => {
+                return response.json();
+            }).then(results => {
+                console.log(results);
+                table = $('#dataset_table').DataTable({
+                    "data": results,
+                    "columns": [
+                        { "data": "dataset_name", "width": "15%" },
+                        { "data": "dataset_type", "width": "10%" },
+                        { "data": "dataset_decs", "width": "25%" },
+                        { "data": "preparation_progress", "width": "17%"},
+                        { "data": "created_date", "width": "15%"},
+                        { "": null }
+                    ],
+                    "columnDefs": [
+                        {
+                            targets: -1,
+                            "searchable": false,
+                            "orderable": false,
+                            render: function (data, type, row, meta) {
+                                console.log(row['row_id']);
+                                start_div = "<div class='row'>"
+                                review_button = '<div style="width:50%"><a style="width:100%" class="btn btn-info" href="/review_dataset?dataset_name='+row['dataset_name']+'"><i class="far fa-edit"></i></a></div>'
+                                delete_button = '<div style="width:50%"><form style="width:100%" action="delete_dataset" method="POST"><button style="width:100%" name="dl_dataset" type="submit" class="btn btn-danger dl_dataset" value="' + row['dataset_name'] + '""><i class="far fa-trash-alt"></i></button></form></div>';
+                                end_div = "</div>"
+                                return start_div+review_button+delete_button+end_div;
+                            }
+                        }
+                    ]
+                });
+            });
         });
-
         function remove_class(class_id) {
             document.getElementById("remove_" + class_id).remove();
         }
