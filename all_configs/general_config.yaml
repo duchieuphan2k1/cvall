@@ -1,0 +1,8 @@
+path:
+  datasets_dir: datasets
+  demo_dir_name: demo_stuff
+  demo_output_name: predicted
+
+  models_dir: models
+  model_ckpt_name: ckpt
+  model_configs_name: configs

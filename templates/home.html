@@ -1,0 +1,53 @@
+{% include 'header.html' %}
+
+<style>
+    .wrapper {
+        width: 100%;
+        /*This part is important for centering*/
+        display: grid;
+        place-items: center;
+    }
+
+    .typing-demo {
+        width: 30ch;
+        animation: typing 2s steps(22), blink .5s step-end infinite alternate;
+        white-space: nowrap;
+        overflow: hidden;
+        border-right: 3px solid;
+        font-family: monospace;
+        font-size: 2em;
+    }
+
+    @keyframes typing {
+        from {
+            width: 0
+        }
+    }
+
+    @keyframes blink {
+        50% {
+            border-color: transparent
+        }
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <img style="width: 50%;" src="static/home.gif" alt="">
+        <div style="width: 50%;" class="wrapper">
+            <div class="typing-demo">
+                Let's start our journey!
+                <div>
+                    <a href="/data" class="nav-link">Step 1: Prepare Your Data</a>
+                    <a href="/train" class="nav-link">Step 2: Training Models</a>
+                    <a href="/evaluation" class="nav-link">Step 3: Evaluate Your Models</a>
+                    <a href="/demo" class="nav-link">Step 4: Demo and Enjoy!</a>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <script>
+        $("#home_link").addClass("active");
+    </script>
+</div>

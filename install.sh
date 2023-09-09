@@ -1,0 +1,1 @@
+set PYTHONPATH=%PYTHONPATH%;damo_yolo

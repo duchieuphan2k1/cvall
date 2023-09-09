@@ -1,0 +1,76 @@
+<style>
+    #progressbar {
+        margin-bottom: 30px;
+        overflow: hidden;
+        color: lightgrey
+    }
+
+    #progressbar .active {
+        color: #673AB7
+    }
+
+    #progressbar li {
+        list-style-type: none;
+        font-size: 15px;
+        width: 25%;
+        float: left;
+        position: relative;
+        font-weight: 400
+    }
+
+    #progressbar #create_dataset_progress:before {
+        font-family: "Font Awesome 5 Free";
+        content: '\f0fe';
+    }
+
+    #progressbar #upload_data_progress:before {
+        font-family: "Font Awesome 5 Free";
+        content: "\f151"
+    }
+
+    #progressbar #annotation_progress:before {
+        font-family: "Font Awesome 5 Free";
+        content: "\f2d0"
+    }
+
+    #progressbar #augment_progress:before {
+        font-family: "Font Awesome 5 Free";
+        content: "\f005"
+    }
+
+    #progressbar li:before {
+        width: 50px;
+        height: 50px;
+        line-height: 45px;
+        display: block;
+        font-size: 20px;
+        color: #ffffff;
+        background: lightgray;
+        border-radius: 50%;
+        margin: 0 auto 10px auto;
+        padding: 2px
+    }
+
+    #progressbar li:after {
+        content: '';
+        width: 100%;
+        height: 2px;
+        background: lightgray;
+        position: absolute;
+        left: 0;
+        top: 25px;
+        z-index: -1
+    }
+
+    #progressbar li.active:before,
+    #progressbar li.active:after {
+        background: #673AB7
+    }
+</style>
+
+<ul id="progressbar" class="text-center">
+    <li class="active" id="create_dataset_progress"><strong>Create Dataset</strong></li>
+    <li id="upload_data_progress"><strong>Upload Data</strong></li>
+    <li id="annotation_progress"><strong>Annotation</strong></li>
+    <li id="augment_progress"><strong>Augment Data</strong></li>
+</ul>
