@@ -1,7 +1,7 @@
 from flask import (Flask, flash, Response, render_template, request, redirect, session, url_for, send_file)
 from utils.handle_config import ConfigHandler
 from utils.handle_path import PathHandler
-from damo_yolo.tools.demo import InferRunner
+from damo_yolo2.tools.demo import InferRunner
 import os
 from werkzeug.utils import secure_filename
 
