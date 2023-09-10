@@ -1,0 +1,85 @@
+{% include 'header.html' %}
+
+<div class="container">
+    <br>
+    {% include 'data_process.html' %}
+    <br>
+    <div class="alert alert-info" role="alert">
+        You are viewing general infomation of dataset <strong>{{dataset_name}}</strong>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">General Infomation of <strong>{{dataset_name}}</strong></h5>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Key</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Business Secarino</td>
+                                <td><span class="badge bg-warning text-dark">{{dataset_info['dataset_secarino']}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Dataset Type</td>
+                                <td><span class="badge bg-primary text-light">{{dataset_info['dataset_type']}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Created Date</td>
+                                <td><span class="badge bg-success text-light">{{dataset_info['created_date']}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Dataset Classes</td>
+                                <td>
+                                    {% for class in dataset_info['class_list'] %}
+                                    <span class="badge bg-info text-dark">{{class}}</span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Number of Images</td>
+                                <td><span class="badge bg-dark text-light">{{dataset_info['nbr_images']}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Upload Data Progress</td>
+                                <td><span class="badge bg-warning text-dark">{{dataset_info['upload_dataset_progress']}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Annotation Progress</td>
+                                <td><span class="badge bg-warning text-dark">{{dataset_info['annotation_progress']}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Augment Progress</td>
+                                <td><span class="badge bg-warning text-dark">{{dataset_info['augment_progress']}}</span></td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Take your actions for <strong>{{dataset_name}}</strong></h5>
+                    <p class="card-text">Enjoy the process of making quality datasets!</p>
+                    <a style="width: 100%;" href="/upload_data?dataset_name={{dataset_name}}" class="btn btn-primary">1. Upload New Data</a>
+                    <br><br>
+                    <a style="width: 100%;" href="/data_annotation?dataset_name={{dataset_name}}" class="btn btn-primary">2. Annotate Your Data</a>
+                    <br><br>
+                    <a style="width: 100%;" href="/data_augment?dataset_name={{dataset_name}}" class="btn btn-primary">3. Augment Your Data</a>
+                    <br><br>
+                    <a style="width: 100%;" href="/data_explore?dataset_name={{dataset_name}}" class="btn btn-primary">4. Explore Your Data</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $("#create_dataset_progress").addClass("active");
+    </script>
+</div>

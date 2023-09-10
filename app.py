@@ -23,6 +23,18 @@ def home():
 def data():
     return render_template("data.html")
 
+@app.route("/review_dataset")
+def review_dataset():
+    dataset_name = request.args.get("dataset_name")
+    dataset_info = dataset_handler.get_info_by_name(dataset_name)
+    return render_template("dataset_overview.html", dataset_name=dataset_name, dataset_info=dataset_info)
+
+@app.route("/upload_data")
+def upload_data():
+    dataset_name = request.args.get("dataset_name")
+    dataset_info = dataset_handler.get_info_by_name(dataset_name)
+    return render_template("upload_data.html", dataset_name=dataset_name, nbr_images=dataset_info['nbr_images'])
+
 @app.route("/check_dataset_name", methods=["POST"])
 def check_dataset_name():
     dataset_name = request.form.get("dataset_name")

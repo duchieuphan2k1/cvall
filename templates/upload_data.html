@@ -1,0 +1,77 @@
+{% include 'header.html' %}
+
+<div class="container">
+    <br>
+    {% include 'data_process.html' %}
+    <br>
+    <div class="alert alert-info" role="alert">
+        You are uploading data for <strong>{{dataset_name}}</strong>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" onchange="swap_video()" type="checkbox" value="" id="upload_video_choice">
+        <label class="form-check-label" for="upload_video_choice">
+            Upload Video
+        </label>
+    </div>
+    <div class="card text-center">
+        <div class="card-header">
+            {{dataset_name}}
+        </div>
+        <div class="card-body">
+            <p>Number of uploaded images: <span class="badge bg-warning text-dark">{{nbr_images}}</span></p>
+            <div id="image_uploader" class="row">
+                <form style="width: 50%;" action="/upload_file" method="post" enctype="multipart/form-data">
+                    <label for="files">Upload Images via files (jpg, ipeg, png, bmp)</label>
+                    <input multiple class="form-control" type="file" name="files" id="files" onchange="form.submit()">
+                </form>
+                <form style="width: 50%;" action="/upload_file" method="post" enctype="multipart/form-data">
+                    <label for="folder">Upload Images via folder</label>
+                    <input class="form-control" type="file" name="folder" id="folder" webkitdirectory mozdirectory
+                        onchange="form.submit()">
+                </form>
+            </div>
+            <div id="video_uploader">
+                <form class="row" action="/upload_file" method="post" enctype="multipart/form-data">
+                    <div style="width: 50%;" class="mb-3">
+                        <label for="video_file" class="form-label">Upload Video (mp4, avi)</label>
+                        <input class="form-control" type="file" name="video_file" id="video_file">
+                    </div>
+                    <div style="width: 50%;" class="mb-3">
+                        <label for="video_fps" class="form-label">Input FPS for extracting images</label>
+                        <input value="3" type="number" class="form-control" id="video_fps">
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" style="width: 50%;" class="btn btn-primary">Start Extracting Images</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            <div class="text-center">
+                <a href="/review_dataset?dataset_name={{dataset_name}}" style="width: 300px;"
+                    class="btn btn-warning">Back to overview</a>
+                <a href="/review_dataset?dataset_name={{dataset_name}}" style="width: 300px;"
+                    class="btn btn-success">Continue to annotation process</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#image_uploader").show();
+        $("#video_uploader").hide();
+        $("#upload_data_progress").addClass("active");
+        function swap_video() {
+            if ($("#upload_video_choice").prop('checked') == true) {
+                $("#image_uploader").hide(200);
+                $("#video_uploader").show(200);
+            }
+            else {
+                $("#video_uploader").hide(200);
+                $("#image_uploader").show(200);
+            }
+
+        }
+
+    </script>
+</div>

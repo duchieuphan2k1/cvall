@@ -35,6 +35,26 @@ class DatasetHandler:
     def get_info_by_name(self, dataset_name):
         dataset_info_path = self.path_handler.get_dataset_info_path_by_name(dataset_name)
         dataset_info = yaml.safe_load(open(dataset_info_path, 'r'))
+        image_path = self.path_handler.get_image_path_by_name(dataset_name)
+        dataset_info['nbr_images'] = len(os.listdir(image_path))
+
+        if dataset_info['preparation_progress'] == 1:
+            dataset_info['upload_dataset_progress'] = "Not Yet"
+            dataset_info['annotation_progress'] = "Not Yet"
+            dataset_info['augment_progress'] = "Not Yet"
+        elif dataset_info['preparation_progress'] == 2:
+            dataset_info['upload_dataset_progress'] = "Done"
+            dataset_info['annotation_progress'] = "Not Yet"
+            dataset_info['augment_progress'] = "Not Yet"
+        elif dataset_info['preparation_progress'] == 3:
+            dataset_info['upload_dataset_progress'] = "Done"
+            dataset_info['annotation_progress'] = "Done"
+            dataset_info['augment_progress'] = "Not Yet"
+        elif dataset_info['preparation_progress'] == 3:
+            dataset_info['upload_dataset_progress'] = "Done"
+            dataset_info['annotation_progress'] = "Done"
+            dataset_info['augment_progress'] = "Done"
+
         return dataset_info
     
     def get_all_info(self):
