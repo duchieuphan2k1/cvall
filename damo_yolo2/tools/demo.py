@@ -256,7 +256,7 @@ class Infer():
         return vis_img
 
 class InferRunner():
-    def __init__(self, config_file, engine, output_dir, infer_size=[1024, 1024], conf=0.6, device="cpu"):
+    def __init__(self, config_file, engine, output_dir='./', infer_size=[1024, 1024], conf=0.6, device="cpu"):
         self.config_file = config_file
         self.infer_size = infer_size
         self.conf = conf
@@ -266,6 +266,10 @@ class InferRunner():
         self.output_dir = output_dir
         self.infer_engine = Infer(config, infer_size=self.infer_size, device=self.device,
             output_dir=output_dir, ckpt=self.engine, end2end=False)
+
+    def predict(self, origin_img):
+        bboxes, scores, cls_inds = self.infer_engine.forward(origin_img)
+        return bboxes, scores, cls_inds
 
     def run_image(self, image_path):
         origin_img = np.asarray(Image.open(image_path).convert('RGB'))

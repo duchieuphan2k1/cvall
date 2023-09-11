@@ -1,0 +1,40 @@
+{% include 'header.html' %}
+
+<div class="container">
+    <br>
+    {% include 'data_process.html' %}
+    <br>
+    <div class="alert alert-info" role="alert">
+        You are annotating data for <strong>{{dataset_name}}</strong>. This dataset has <strong>{{nbr_images}}</strong> images.
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Auto-Annotation by the trained model</h5>
+                    <p class="card-text">Save 95% your time on annotation process!</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Adjust the auto-annotated data</h5>
+                    <p class="card-text">Simple and Fast review by using LabelMe tool!</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="text-center">
+        <a href="/review_dataset?dataset_name={{dataset_name}}" style="width: 300px;"
+            class="btn btn-warning">Back to overview</a>
+        <a href="/review_dataset?dataset_name={{dataset_name}}" style="width: 300px;"
+            class="btn btn-success">Continue to augment process</a>
+    </div>
+    <script>
+        $("#annotation_progress").addClass("active");
+    </script>
+</div>

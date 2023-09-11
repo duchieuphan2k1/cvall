@@ -4,6 +4,7 @@ from utils.handle_path import PathHandler
 from utils.handle_dataset import DatasetHandler
 from damo_yolo2.tools.demo import InferRunner
 import os
+import cv2
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -34,6 +35,45 @@ def upload_data():
     dataset_name = request.args.get("dataset_name")
     dataset_info = dataset_handler.get_info_by_name(dataset_name)
     return render_template("upload_data.html", dataset_name=dataset_name, nbr_images=dataset_info['nbr_images'])
+
+@app.route("/data_annotation")
+def data_annotation():
+    dataset_name = request.args.get("dataset_name")
+    dataset_info = dataset_handler.get_info_by_name(dataset_name)
+    return render_template("data_annotation.html", dataset_name=dataset_name, nbr_images=dataset_info['nbr_images'])
+
+@app.route("/upload_images", methods=["POST"])
+def upload_images():
+    dataset_name = request.form.get("dataset_name")
+    print(dataset_name)
+    all_files = request.files.getlist('file')
+    image_path = path_handler.get_image_path_by_name(dataset_name)
+    for file in all_files:
+        if file:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(image_path, filename))
+
+            file_extension = filename.split('.')[-1]
+            if file_extension!="jpg":
+                img = cv2.imread(os.path.join(image_path, filename))
+                cv2.imwrite(os.path.join(image_path, filename.replace(file_extension, 'jpg')), img)
+                os.remove(os.path.join(image_path, filename))
+
+    return redirect('/upload_data?dataset_name={}'.format(dataset_name))
+
+@app.route("/upload_video", methods=["POST"])
+def upload_video():
+    dataset_name = request.form.get("dataset_name")
+    video_fps = int(request.form.get("video_fps"))
+    file = request.files['video_file']
+
+    dataset_path = path_handler.get_dataset_path_by_name(dataset_name)
+    if file:
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(dataset_path, filename))
+        dataset_handler.extract_images(dataset_name, filename, video_fps)
+
+    return "Video Uploaded"
 
 @app.route("/check_dataset_name", methods=["POST"])
 def check_dataset_name():

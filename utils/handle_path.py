@@ -55,6 +55,7 @@ class PathHandler:
         return path
     
     def get_image_path_by_name(self, dataset_name):
+        print("dataset_name", dataset_name)
         dataset_path = self.get_dataset_path_by_name(dataset_name)
         path = os.path.join(dataset_path, self.general_config.path.image_dir_name)
         return path
@@ -62,4 +63,23 @@ class PathHandler:
     def get_dataset_info_path_by_name(self, dataset_name):
         dataset_path = self.get_dataset_path_by_name(dataset_name)
         path = os.path.join(dataset_path, self.general_config.path.dataset_info_file)
+        return path
+    
+    def get_labelme_annotation_path(self, dataset_name):
+        dataset_path = self.get_dataset_path_by_name(dataset_name)
+        path = os.path.join(dataset_path, self.general_config.path.labelme_annotation_name)
+        if not os.path.exists(path):
+            os.mkdir(path)
+        return path
+    
+    def get_coco_annotation_dir(self, dataset_name):
+        dataset_path = self.get_dataset_path_by_name(dataset_name)
+        path = os.path.join(dataset_path, self.general_config.path.coco_annotaton_name)
+        if not os.path.exists(path):
+            os.mkdir(path)
+        return path
+
+    def get_coco_annotation_file(self, dataset_name):
+        coco_annotation_dir = self.get_coco_annotation_dir(dataset_name)
+        path = os.path.join(coco_annotation_dir, self.general_config.path.coco_annotaton_file)
         return path

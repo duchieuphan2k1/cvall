@@ -4,6 +4,8 @@ import os
 import shutil
 from datetime import datetime
 import yaml
+import cv2
+from tqdm import tqdm
 
 class DatasetHandler:
     def __init__(self):
@@ -72,3 +74,24 @@ class DatasetHandler:
             shutil.rmtree(dataset_path)
 
         return True
+    
+    def extract_images(self, dataset_name, video_name, video_fps):
+        dataset_path = self.path_handler.get_dataset_path_by_name(dataset_name)
+        video_path = os.path.join(dataset_path, video_name)
+        image_path = self.path_handler.get_image_path_by_name(dataset_name)
+        vidcap = cv2.VideoCapture(video_path)
+        fps = vidcap.get(cv2.CAP_PROP_FPS)
+        length = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+        ratio = int(fps/video_fps)
+
+        ratio = 1 if ratio==0 else ratio
+        count = 0
+        for i in tqdm(range(length)):
+            success,image = vidcap.read()
+            if i%ratio == 0:
+                cv2.imwrite(os.path.join(image_path, "img_{:06d}.jpg".format(count)), image)
+                count+=1
+
+
+

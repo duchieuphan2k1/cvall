@@ -20,38 +20,53 @@
         <div class="card-body">
             <p>Number of uploaded images: <span class="badge bg-warning text-dark">{{nbr_images}}</span></p>
             <div id="image_uploader" class="row">
-                <form style="width: 50%;" action="/upload_file" method="post" enctype="multipart/form-data">
+                <form style="width: 50%;" action="/upload_images" method="post" enctype="multipart/form-data">
                     <label for="files">Upload Images via files (jpg, ipeg, png, bmp)</label>
-                    <input multiple class="form-control" type="file" name="files" id="files" onchange="form.submit()">
+                    <input type="text" id="dataset_name" name="dataset_name" value="{{dataset_name}}"
+                        style="display: none;">
+                    <input multiple class="form-control" type="file" name="file" id="file" onchange="form.submit()">
                 </form>
-                <form style="width: 50%;" action="/upload_file" method="post" enctype="multipart/form-data">
+                <form style="width: 50%;" action="/upload_images" method="post" enctype="multipart/form-data">
                     <label for="folder">Upload Images via folder</label>
-                    <input class="form-control" type="file" name="folder" id="folder" webkitdirectory mozdirectory
+                    <input type="text" id="dataset_name" name="dataset_name" value="{{dataset_name}}"
+                        style="display: none;">
+                    <input class="form-control" type="file" name="file" id="file" webkitdirectory mozdirectory
                         onchange="form.submit()">
                 </form>
             </div>
             <div id="video_uploader">
-                <form class="row" action="/upload_file" method="post" enctype="multipart/form-data">
+                <form id="video_upload_form" class="row" enctype="multipart/form-data">
                     <div style="width: 50%;" class="mb-3">
                         <label for="video_file" class="form-label">Upload Video (mp4, avi)</label>
                         <input class="form-control" type="file" name="video_file" id="video_file">
                     </div>
+                    <input type="text" id="dataset_name" name="dataset_name" value="{{dataset_name}}"
+                        style="display: none;">
                     <div style="width: 50%;" class="mb-3">
                         <label for="video_fps" class="form-label">Input FPS for extracting images</label>
-                        <input value="3" type="number" class="form-control" id="video_fps">
+                        <input value="3" type="number" class="form-control" id="video_fps" name="video_fps">
                     </div>
-
                     <div class="text-center">
-                        <button type="submit" style="width: 50%;" class="btn btn-primary">Start Extracting Images</button>
+                        <button id="upload_video_button" style="width: 50%;" class="btn btn-primary">Start Extracting
+                            Images</button>
                     </div>
                 </form>
+            </div>
+            <div id="extracting_progress" class="text-center">
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <br>
+                <span>We are extracting frames from video.. Please wait until completed!</span>
             </div>
         </div>
         <div class="card-footer text-muted">
             <div class="text-center">
                 <a href="/review_dataset?dataset_name={{dataset_name}}" style="width: 300px;"
                     class="btn btn-warning">Back to overview</a>
-                <a href="/review_dataset?dataset_name={{dataset_name}}" style="width: 300px;"
+                <a href="/data_annotation?dataset_name={{dataset_name}}" style="width: 300px;"
                     class="btn btn-success">Continue to annotation process</a>
             </div>
         </div>
@@ -60,7 +75,29 @@
     <script>
         $("#image_uploader").show();
         $("#video_uploader").hide();
+        $("#extracting_progress").hide();
         $("#upload_data_progress").addClass("active");
+
+        $("form#video_upload_form").submit(function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            $("#video_uploader").hide();
+            $("#extracting_progress").show();
+
+            $.ajax({
+                url: '/upload_video',
+                type: 'POST',
+                data: formData,
+                success: function (data) {
+                    alert(data);
+                    location.reload();
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+
         function swap_video() {
             if ($("#upload_video_choice").prop('checked') == true) {
                 $("#image_uploader").hide(200);

@@ -8,3 +8,7 @@ path:
   models_dir: models
   model_ckpt_name: ckpt
   model_configs_name: configs
+
+  labelme_annotation_name: labelme_annotations
+  coco_annotaton_name: coco_annotations
+  coco_annotaton_file: annotation.json
