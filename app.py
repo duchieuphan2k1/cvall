@@ -2,9 +2,12 @@ from flask import (Flask, flash, Response, render_template, request, redirect, s
 from utils.handle_config import ConfigHandler
 from utils.handle_path import PathHandler
 from utils.handle_dataset import DatasetHandler
+from utils.handle_model import ModelHandler
+from evaluation.predict_dataset import PredictDataset
 from damo_yolo2.tools.demo import InferRunner
 import os
 import cv2
+import ast
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -15,6 +18,7 @@ general_cfg = cfg_handle.get_general_config()
 
 path_handler = PathHandler()
 dataset_handler = DatasetHandler()
+model_handler = ModelHandler()
 
 @app.route("/")
 def home():
@@ -40,7 +44,48 @@ def upload_data():
 def data_annotation():
     dataset_name = request.args.get("dataset_name")
     dataset_info = dataset_handler.get_info_by_name(dataset_name)
-    return render_template("data_annotation.html", dataset_name=dataset_name, nbr_images=dataset_info['nbr_images'])
+    models_dir = general_cfg.path.models_dir
+    models = os.listdir(models_dir)
+    return render_template("data_annotation.html", dataset_name=dataset_name, nbr_images=dataset_info['nbr_images'], models=models, all_datasets=dataset_info['class_list'])
+
+@app.route("/get_model_classes", methods=['POST'])
+def get_model_classes():
+    model_name = request.form.get('model_name')
+    classes = model_handler.get_classes_by_name(model_name)
+    return classes
+
+@app.route("/auto_annotate", methods=['POST'])
+def auto_annotate():
+    dataset_name = request.form.get('dataset_name')
+    model_name = request.form.get('model_name')
+    selected_classes = request.form.get('selected_classes')
+    selected_classes = ast.literal_eval(selected_classes)
+
+    changed_names = request.form.get('changed_names')
+    changed_names = ast.literal_eval(changed_names)
+
+    print(selected_classes)
+    predict_dataset = PredictDataset(dataset_name, model_name, generate_annotation=1)
+    predict_dataset.runs(selected_classes, changed_names)
+    return "Done"
+
+@app.route("/get_auto_annotation_progress", methods=['POST'])
+def get_auto_annotation_progress():
+    dataset_name = request.form.get('dataset_name')
+    dataset_info = dataset_handler.get_info_by_name(dataset_name)
+    nbr_auto_annotated = dataset_info['nbr_auto_annotated']
+    nbr_images = dataset_info['nbr_images']
+    percent = int(nbr_auto_annotated/nbr_images*100)
+    return [percent]
+
+@app.route("/review_label", methods=["POST"])
+def review_label():
+    dataset_name = request.form.get('dataset_name')
+    img_dir = path_handler.get_image_path_by_name(dataset_name)
+    labelme_dir = path_handler.get_labelme_annotation_path(dataset_name)
+    os.system("labelme {} -o {} --autosave --nodata".format(img_dir, labelme_dir))
+    dataset_handler.update_preparation_progress(dataset_name, 3)
+    return "Finished Review!"
 
 @app.route("/upload_images", methods=["POST"])
 def upload_images():
@@ -59,6 +104,7 @@ def upload_images():
                 cv2.imwrite(os.path.join(image_path, filename.replace(file_extension, 'jpg')), img)
                 os.remove(os.path.join(image_path, filename))
 
+    dataset_handler.update_preparation_progress(dataset_name, 2)
     return redirect('/upload_data?dataset_name={}'.format(dataset_name))
 
 @app.route("/upload_video", methods=["POST"])
@@ -74,6 +120,14 @@ def upload_video():
         dataset_handler.extract_images(dataset_name, filename, video_fps)
 
     return "Video Uploaded"
+
+@app.route("/data_augment", methods=['GET'])
+def data_augment():
+    dataset_name = request.args.get("dataset_name")
+    dataset_info = dataset_handler.get_info_by_name(dataset_name)
+    nbr_auto_annotated = dataset_info['nbr_auto_annotated']
+    nbr_images = dataset_info['nbr_images']
+    return render_template("augment.html", dataset_name=dataset_name, nbr_auto_annotated=nbr_auto_annotated, nbr_images=nbr_images)
 
 @app.route("/check_dataset_name", methods=["POST"])
 def check_dataset_name():

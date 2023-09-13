@@ -6,6 +6,13 @@ class PathHandler:
         self.cfg_handler = ConfigHandler()
         self.general_config = self.cfg_handler.get_general_config()
     
+    def get_model_params_path_by_name(self, model_name):
+        models_dir = self.general_config.path.models_dir
+        model_path = os.path.join(models_dir, model_name)
+        model_yaml_name = self.general_config.path.model_yaml_name
+        yaml_path = os.path.join(model_path, model_yaml_name)
+        return yaml_path
+
     def get_ckpt_path_by_name(self, model_name):
         models_dir = self.general_config.path.models_dir
         model_ckpt_name = self.general_config.path.model_ckpt_name

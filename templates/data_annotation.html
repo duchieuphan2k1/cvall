@@ -5,36 +5,175 @@
     {% include 'data_process.html' %}
     <br>
     <div class="alert alert-info" role="alert">
-        You are annotating data for <strong>{{dataset_name}}</strong>. This dataset has <strong>{{nbr_images}}</strong> images.
+        You are annotating data for <strong>{{dataset_name}}</strong>. This dataset has <strong>{{nbr_images}}</strong>
+        images.
     </div>
-    <div class="row">
-        <div class="col-sm-6">
+    <input id="dataset_name" value="{{dataset_name}}" style="display: none;">
+    <div>
+        <div class="col-sm-12">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Auto-Annotation by the trained model</h5>
                     <p class="card-text">Save 95% your time on annotation process!</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
+
+                    <div id="auto_annotate_action">
+                        <label for="model_name">Choose your detection model</label>
+                        <select onchange="get_model_classes()" id="model_name" class="form-select" aria-label="">
+                            {% for model_name in models: %}
+                            <option value="{{model_name}}">{{model_name}}</option>
+                            {% endfor %}
+                        </select>
+                        <br>
+                        <div id="model_classes">
+                            <p><strong>Below are the classes of this model. Choose classes that you need!</strong></p>
+                            <div id="classes_checkbox">
+                            </div>
+                            <br>
+                            <p><strong>Then change names of them according to your dataset classes</strong></p>
+                            <div id="modify_label">
+
+                            </div>
+                        </div>
+                        <br>
+                        <div class="text-center">
+                            <button onclick="auto_annotate()" id="auto_annotate_button" style="width: 100%;"
+                                class="btn btn-warning">Auto-Annotate {{dataset_name}}</button>
+                        </div>
+                    </div>
+                    <div id="auto_annotate_tracking" style="display: none;">
+                        <div class="progress">
+                            <div id="auto_annotation_bar"
+                                class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                                style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                        </div>
+                        <br>
+                        <strong>
+                            <p id="annotate_text">Auto-annotate process is running, wait for a while...</p>
+                        </strong>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-sm-6">
+        <hr>
+        <div class="col-sm-12">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Adjust the auto-annotated data</h5>
                     <p class="card-text">Simple and Fast review by using LabelMe tool!</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                    <a onclick="open_review()" style="width: 100%;" class="btn btn-primary">Review Annotation</a>
                 </div>
             </div>
         </div>
     </div>
     <br>
     <div class="text-center">
-        <a href="/review_dataset?dataset_name={{dataset_name}}" style="width: 300px;"
-            class="btn btn-warning">Back to overview</a>
-        <a href="/review_dataset?dataset_name={{dataset_name}}" style="width: 300px;"
-            class="btn btn-success">Continue to augment process</a>
+        <a href="/review_dataset?dataset_name={{dataset_name}}" style="width: 300px;" class="btn btn-warning">Back to
+            overview</a>
+        <a href="/data_augment?dataset_name={{dataset_name}}" style="width: 300px;" class="btn btn-success">Continue
+            to augment process</a>
     </div>
     <script>
         $("#annotation_progress").addClass("active");
+        var status_interval = null;
+        var done_generate = false;
+        get_model_classes();
+
+        function open_review() {
+            $.ajax({
+                type: 'POST',
+                url: "/review_label",
+                data: { dataset_name: $('#dataset_name').val() },
+                success: function (resultData) {
+                    alert(resultData);
+                }
+            });
+        }
+
+        function add_change(id){
+            var class_name = $("#"+id).val()
+            if ($("#"+id).prop('checked') == true) {
+                $("#modify_label").append('<div id="wrapper_'+class_name+'" class="input-group mb-3"><input readonly class="form-control" id="change_'+class_name+'" value="'+class_name+'"><span class="input-group-text"><i class="fas fa-arrow-right"></i></span></div>');
+                $("#wrapper_"+class_name).append('<select id="changed_'+class_name+'" class="form-select" aria-label="">{% for dts_name in all_datasets %} <option value="{{dts_name}}">{{dts_name}}</option> {% endfor %}</select>')
+            } 
+            else{
+                $("#wrapper_"+class_name).remove();
+            }
+        }
+
+        function get_model_classes() {
+            var model_name = $("#model_name").val();
+            $.ajax({
+                url: '/get_model_classes',
+                type: 'POST',
+                data: {
+                    model_name: model_name
+                },
+                success: function (data) {
+                    $("#classes_checkbox").empty()
+                    // <label class="checkbox-inline">
+                    //             <input type="checkbox" value="">Option 1
+                    //         </label>
+                    for (let i = 0; i < data.length; i++) {
+                        $("#classes_checkbox").append('<label style="margin-right: 10px" class="checkbox-inline"><input id="class_'+data[i]+'" onclick=add_change(\'class_'+data[i]+'\') type="checkbox" value="' + data[i] + '"><span class="badge bg-info text-dark">' + data[i] + '</span></label>')
+                    }
+                }
+            });
+        }
+
+        function auto_annotate() {
+            var selected = [];
+            $('#modify_label input').each(function () {
+                selected.push($(this).attr('value'));
+            });
+
+            var changed_names = []
+            for (let i = 0; i < selected.length; i++) {
+                changed_id =  'changed_' + selected[i]
+                console.log(changed_id)
+                changed_names.push($("#" + changed_id).val());
+            }
+            model_name = $("#model_name").val();
+            dataset_name = $("#dataset_name").val();
+
+            console.log(selected);
+            status_interval = setInterval(get_progress, 2000);
+            $("#auto_annotate_action").css("display", 'none');
+            $("#auto_annotate_tracking").css("display", 'block');
+
+            $.ajax({
+                url: '/auto_annotate',
+                type: 'POST',
+                data: {
+                    model_name: model_name,
+                    selected_classes: JSON.stringify(selected),
+                    changed_names: JSON.stringify(changed_names),
+                    dataset_name: dataset_name
+                },
+                success: function (data) {
+                    console.log(data)
+                }
+            });
+        }
+
+        function get_progress() {
+            $.ajax({
+                type: 'POST',
+                url: "{{url_for('get_auto_annotation_progress')}}",
+                data: { dataset_name: $('#dataset_name').val() },
+                success: function (resultData) {
+                    console.log(resultData[0]);
+                    console.log('===');
+                    $('#auto_annotation_bar').attr('aria-valuenow', resultData[0]).css('width', resultData[0] + '%').text(resultData[0] + '%');
+                    if (resultData[0] == 100) {
+                        clearInterval(status_interval);
+                        if (!done_generate) {
+                            $("#annotate_text").text("Auto-annotate process has done. Let's review the annotation!")
+                            console.log("===");
+                        }
+                        done_generate = true;
+                    }
+                }
+            });
+        }
     </script>
 </div>

@@ -1,0 +1,50 @@
+{% include 'header.html' %}
+
+<div class="container">
+    <br>
+    {% include 'data_process.html' %}
+    <br>
+    <div class="alert alert-info" role="alert">
+        Boost accuracy by augmenting data for <strong>{{dataset_name}}</strong>. This dataset has
+        <strong>{{nbr_auto_annotated}}/{{nbr_images}}</strong> annotated images.
+    </div>
+    <div class="card text-center">
+        <div class="card-header">
+            <strong>Step 1. Extract the objects from images</strong>
+        </div>
+        <div class="card-body">
+            <img class="img-fluid" src="static/segment_process.png" alt="">
+            <div class="row">
+                <div class="col-sm-6">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">1. Auto-segment objects</h5>
+                      <span><span class="badge bg-danger">Warning</span> If the dataset {{dataset_name}} has segmented before, </span><br>
+                      <span class="card-text">those segmentation annotation <strong>will be deleted!</strong></span><br>
+                      <br>
+                      <a href="#" class="btn btn-primary">I understand, start segmenting</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">2. Review segmentation result by annotation tool</h5>
+                      <span><span class="badge bg-warning">After auto-segmented</span></span><br>
+                      <span class="card-text">Make sure that it has run the Auto-segment process before!</span><br>
+                      <br>
+                      <a href="#" class="btn btn-primary">I'm sure, go reviewing segmentation</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div>
+        <div class="card-footer text-muted">
+            <button style="width: 30%; min-width: 200px;" class="btn btn-warning">Start Extract Objects</button>
+        </div>
+    </div>
+    <input id="dataset_name" value="{{dataset_name}}" style="display: none;">
+    <script>
+        $("#augment_progress").addClass("active");
+    </script>
+</div>

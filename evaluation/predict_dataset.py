@@ -3,6 +3,7 @@ from utils.handle_path import PathHandler
 from utils.handle_dataset import DatasetHandler
 from utils.handle_model import ModelHandler
 import os
+import shutil
 import json
 import numpy as np
 from PIL import Image
@@ -34,7 +35,19 @@ class PredictDataset():
             }
         self.coco_template = {}
 
-    def runs(self):
+    def normalize_classes(self, classes):
+        normalized_classes = []
+        for class_name in classes:
+            normalized_classes.append( '_'.join(class_name.split(" ")))
+        return normalized_classes
+    
+    def runs(self, classes, changed_names):
+        if os.path.exists(self.labelme_annot_folder):
+            shutil.rmtree(self.labelme_annot_folder)
+        os.mkdir(self.labelme_annot_folder)
+
+        classes = self.normalize_classes(classes)
+
         all_images = os.listdir(self.image_folder)
         for image_name in all_images:
             labelme_img = self.labelme_template
@@ -47,13 +60,19 @@ class PredictDataset():
 
             bboxes, scores, cls_inds = self.infer_runner.predict(origin_img)
             shapes = []
-            ['label', 'points', 'group_id', 'description', 'shape_type', 'flags']
             for i in range(len(bboxes)):
                 bbox = bboxes[i].tolist()
                 scr = scores[i].tolist()
                 class_name = self.infer_runner.infer_engine.class_names[int(cls_inds[i].item())]
+
+                if len(classes) != 0:
+                    if class_name not in classes:
+                        continue
+
+                class_index = classes.index(class_name)
+                class_name = changed_names[class_index]
                 box_annot = {
-                    'label': '_'.join(class_name.split(" ")),
+                    'label': class_name,
                     'points': [[bbox[0], bbox[1]], [bbox[2], bbox[3]]],
                     'group_id': None,
                     'description': "",
@@ -69,4 +88,4 @@ class PredictDataset():
 
 if __name__ == "__main__":
     pdt = PredictDataset("test01", "first_demo_model", generate_annotation=True)
-    pdt.runs()
+    pdt.runs(['car', 'person'])

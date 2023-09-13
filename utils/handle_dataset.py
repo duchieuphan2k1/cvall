@@ -33,12 +33,23 @@ class DatasetHandler:
         with open(dataset_info_path, 'w') as f:
             yaml.dump(dataset_info, f)
         return True
-
+    
+    def update_preparation_progress(self, dataset_name, preparation_progress):
+        dataset_info_path = self.path_handler.get_dataset_info_path_by_name(dataset_name)
+        dataset_info = yaml.safe_load(open(dataset_info_path, 'r'))
+        dataset_info['preparation_progress'] == preparation_progress
+        with open(dataset_info_path, 'w') as f:
+            yaml.dump(dataset_info, f)
+        return True
+    
     def get_info_by_name(self, dataset_name):
         dataset_info_path = self.path_handler.get_dataset_info_path_by_name(dataset_name)
         dataset_info = yaml.safe_load(open(dataset_info_path, 'r'))
         image_path = self.path_handler.get_image_path_by_name(dataset_name)
         dataset_info['nbr_images'] = len(os.listdir(image_path))
+
+        labelme_path = self.path_handler.get_labelme_annotation_path(dataset_name)
+        dataset_info['nbr_auto_annotated'] = len(os.listdir(labelme_path))
 
         if dataset_info['preparation_progress'] == 1:
             dataset_info['upload_dataset_progress'] = "Not Yet"
