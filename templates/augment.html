@@ -1,50 +1,169 @@
 {% include 'header.html' %}
 
 <div class="container">
-    <br>
-    {% include 'data_process.html' %}
-    <br>
-    <div class="alert alert-info" role="alert">
-        Boost accuracy by augmenting data for <strong>{{dataset_name}}</strong>. This dataset has
-        <strong>{{nbr_auto_annotated}}/{{nbr_images}}</strong> annotated images.
+  <br>
+  {% include 'data_process.html' %}
+  <br>
+  <div class="alert alert-info" role="alert">
+    Boost accuracy by augmenting data for <strong>{{dataset_name}}</strong>. This dataset has
+    <strong>{{nbr_auto_annotated}}/{{nbr_images}}</strong> annotated images.
+  </div>
+  <div class="card text-center">
+    <div class="card-header">
+      <strong>Step 1. Extract the objects from images</strong>
     </div>
-    <div class="card text-center">
-        <div class="card-header">
-            <strong>Step 1. Extract the objects from images</strong>
-        </div>
-        <div class="card-body">
-            <img class="img-fluid" src="static/segment_process.png" alt="">
-            <div class="row">
-                <div class="col-sm-6">
-                  <div class="card">
-                    <div class="card-body">
-                      <h5 class="card-title">1. Auto-segment objects</h5>
-                      <span><span class="badge bg-danger">Warning</span> If the dataset {{dataset_name}} has segmented before, </span><br>
-                      <span class="card-text">those segmentation annotation <strong>will be deleted!</strong></span><br>
-                      <br>
-                      <a href="#" class="btn btn-primary">I understand, start segmenting</a>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-sm-6">
-                  <div class="card">
-                    <div class="card-body">
-                      <h5 class="card-title">2. Review segmentation result by annotation tool</h5>
-                      <span><span class="badge bg-warning">After auto-segmented</span></span><br>
-                      <span class="card-text">Make sure that it has run the Auto-segment process before!</span><br>
-                      <br>
-                      <a href="#" class="btn btn-primary">I'm sure, go reviewing segmentation</a>
-                    </div>
-                  </div>
-                </div>
+    <div class="card-body">
+      <img class="img-fluid" src="static/segment_process.png" alt="">
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">1. Auto-segment objects</h5>
+
+              <div id="segment_action">
+                <span><span class="badge bg-danger">Warning</span> If the dataset {{dataset_name}} has segmented before,
+                </span><br>
+                <span class="card-text">those segmentation annotation <strong>will be deleted!</strong></span><br>
+                <br>
+                <a onclick="segment_dataset()" class="btn btn-primary">I understand, start segmenting</a>
               </div>
+
+              <div id="segment_tracking" style="display: none;">
+                <br>
+                <div class="progress">
+                  <div id="segment_bar" class="progress-bar progress-bar-striped progress-bar-animated"
+                    role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%
+                  </div>
+                </div>
+                <br>
+                <strong>
+                  <p id="segment_text">Segmentation process is running, wait for a while...</p>
+                </strong>
+              </div>
+
+            </div>
+          </div>
         </div>
-        <div class="card-footer text-muted">
-            <button style="width: 30%; min-width: 200px;" class="btn btn-warning">Start Extract Objects</button>
+        <div class="col-sm-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">2. Review segmentation result by annotation tool</h5>
+              <span><span class="badge bg-warning">After auto-segmented</span></span><br>
+              <span class="card-text">Make sure that it has run the Auto-segment process before!</span><br>
+              <br>
+              <a onclick="review_segmentation()" class="btn btn-primary">I'm sure, go reviewing segmentation</a>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+    <div class="card-footer text-muted">
+      <div id="extract_tracking" style="display: none;">
+        <br>
+        <div class="progress">
+          <div id="extract_bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+            style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%
+          </div>
+        </div>
+        <br>
+        <strong>
+          <p id="extract_text">Extract objects process is running, wait for a while...</p>
+        </strong>
+      </div>
+      <button id="extract_button" onclick="start_extract_objects()" style="width: 30%; min-width: 200px;" class="btn btn-warning">Start Extract Objects</button>
     </div>
     <input id="dataset_name" value="{{dataset_name}}" style="display: none;">
-    <script>
-        $("#augment_progress").addClass("active");
-    </script>
+  </div>
+  <script>
+    $("#augment_progress").addClass("active");
+    var status_interval = null;
+    var done_generate = false;
+
+    var extract_interval = null;
+    var done_extract = false;
+
+    function start_extract_objects() {
+      extract_interval = setInterval(get_extract_progress, 1000);
+      $("#extract_button").css("display", 'none');
+      $("#extract_tracking").css("display", 'block');
+      $.ajax({
+        type: 'POST',
+        url: "/start_extract_objects",
+        data: { dataset_name: $('#dataset_name').val() },
+        success: function (resultData) {
+          alert(resultData);
+        }
+      });
+    }
+
+    function get_extract_progress() {
+      $.ajax({
+        type: 'POST',
+        url: "{{url_for('get_extract_progress')}}",
+        data: { dataset_name: $('#dataset_name').val() },
+        success: function (resultData) {
+          console.log(resultData[0]);
+          console.log('===');
+          $('#extract_bar').attr('aria-valuenow', resultData[0]).css('width', resultData[0] + '%').text(resultData[0] + '%');
+          if (resultData[0] == 100) {
+            clearInterval(extract_interval);
+            if (!done_extract) {
+              $("#extract_text").text("All objects has been extracted. Let's augment your data!")
+              console.log("===");
+            }
+            done_extract = true;
+          }
+        }
+      });
+    }
+
+    function review_segmentation() {
+      $.ajax({
+        type: 'POST',
+        url: "/review_segmentation",
+        data: { dataset_name: $('#dataset_name').val() },
+        success: function (resultData) {
+          alert(resultData);
+        }
+      });
+    }
+
+    function segment_dataset() {
+      status_interval = setInterval(get_progress, 2000);
+      $("#segment_action").css("display", 'none');
+      $("#segment_tracking").css("display", 'block');
+      $.ajax({
+        url: '/segment_data',
+        type: 'POST',
+        data: {
+          dataset_name: $('#dataset_name').val()
+        },
+        success: function (data) {
+          console.log(data)
+        }
+      });
+    }
+
+    function get_progress() {
+      $.ajax({
+        type: 'POST',
+        url: "{{url_for('get_segmentation_progress')}}",
+        data: { dataset_name: $('#dataset_name').val() },
+        success: function (resultData) {
+          console.log(resultData[0]);
+          console.log('===');
+          $('#segment_bar').attr('aria-valuenow', resultData[0]).css('width', resultData[0] + '%').text(resultData[0] + '%');
+          if (resultData[0] == 100) {
+            clearInterval(status_interval);
+            if (!done_generate) {
+              $("#segment_text").text("Segmentation process has done. Let's review the annotation!")
+              console.log("===");
+            }
+            done_generate = true;
+          }
+        }
+      });
+    }
+
+  </script>
 </div>

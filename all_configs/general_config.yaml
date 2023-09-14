@@ -11,5 +11,7 @@ path:
   model_yaml_name: params.yaml
 
   labelme_annotation_name: labelme_annotations
+  labelme_segment_annotation_name: labelme_segment_annotations
+  object_dir_name: objects
   coco_annotaton_name: coco_annotations
   coco_annotaton_file: annotation.json

@@ -5,6 +5,7 @@ from utils.handle_dataset import DatasetHandler
 from utils.handle_model import ModelHandler
 from evaluation.predict_dataset import PredictDataset
 from damo_yolo2.tools.demo import InferRunner
+from FastSAM2.fastsam_inference import FastFAM_Infer
 import os
 import cv2
 import ast
@@ -19,6 +20,7 @@ general_cfg = cfg_handle.get_general_config()
 path_handler = PathHandler()
 dataset_handler = DatasetHandler()
 model_handler = ModelHandler()
+fastsam_infer = FastFAM_Infer()
 
 @app.route("/")
 def home():
@@ -87,6 +89,15 @@ def review_label():
     dataset_handler.update_preparation_progress(dataset_name, 3)
     return "Finished Review!"
 
+@app.route("/review_segmentation", methods=["POST"])
+def review_segmentation():
+    dataset_name = request.form.get('dataset_name')
+    img_dir = path_handler.get_image_path_by_name(dataset_name)
+    segment_dir = path_handler.get_labelme_segmentation_path(dataset_name)
+    os.system("labelme {} -o {} --autosave --nodata".format(img_dir, segment_dir))
+    # dataset_handler.update_preparation_progress(dataset_name, 3)
+    return "Finished Review!"
+
 @app.route("/upload_images", methods=["POST"])
 def upload_images():
     dataset_name = request.form.get("dataset_name")
@@ -119,6 +130,7 @@ def upload_video():
         file.save(os.path.join(dataset_path, filename))
         dataset_handler.extract_images(dataset_name, filename, video_fps)
 
+    dataset_handler.update_preparation_progress(dataset_name, 2)
     return "Video Uploaded"
 
 @app.route("/data_augment", methods=['GET'])
@@ -128,6 +140,36 @@ def data_augment():
     nbr_auto_annotated = dataset_info['nbr_auto_annotated']
     nbr_images = dataset_info['nbr_images']
     return render_template("augment.html", dataset_name=dataset_name, nbr_auto_annotated=nbr_auto_annotated, nbr_images=nbr_images)
+
+@app.route("/segment_data", methods=['POST'])
+def segment_data():
+    dataset_name = request.form.get("dataset_name")
+    fastsam_infer.run_dataset(dataset_name)
+    return "Completed Segmentation"
+
+@app.route("/get_segmentation_progress", methods=['POST'])
+def get_segmentation_progress():
+    dataset_name = request.form.get('dataset_name')
+    dataset_info = dataset_handler.get_info_by_name(dataset_name)
+    nbr_auto_annotated = dataset_info['nbr_segmented']
+    nbr_images = dataset_info['nbr_images']
+    percent = int(nbr_auto_annotated/nbr_images*100)
+    return [percent]
+
+@app.route("/start_extract_objects", methods=['POST'])
+def start_extract_objects():
+    dataset_name = request.form.get("dataset_name")
+    fastsam_infer.extract_objects(dataset_name)
+    return "Completed Extracting Objects"
+
+@app.route("/get_extract_progress", methods=['POST'])
+def get_extract_progress():
+    dataset_name = request.form.get('dataset_name')
+    objects_info = dataset_handler.get_nbr_objects(dataset_name)
+    nbr_objects = objects_info['nbr_objects']
+    nbr_extracted_objects = objects_info['nbr_extracted_objects']
+    percent = int(nbr_extracted_objects/nbr_objects*100)
+    return [percent]
 
 @app.route("/check_dataset_name", methods=["POST"])
 def check_dataset_name():
@@ -223,4 +265,4 @@ def download_file():
     file_path = os.path.join(path_handler.get_output_demo_path(), file_name)
     return send_file(file_path, download_name=file_name)
 
-app.run(port=8091, debug=True)
+app.run(port=8091, debug=False)

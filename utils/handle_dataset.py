@@ -5,6 +5,7 @@ import shutil
 from datetime import datetime
 import yaml
 import cv2
+import json
 from tqdm import tqdm
 
 class DatasetHandler:
@@ -37,11 +38,28 @@ class DatasetHandler:
     def update_preparation_progress(self, dataset_name, preparation_progress):
         dataset_info_path = self.path_handler.get_dataset_info_path_by_name(dataset_name)
         dataset_info = yaml.safe_load(open(dataset_info_path, 'r'))
-        dataset_info['preparation_progress'] == preparation_progress
+
+        dataset_info['preparation_progress'] = preparation_progress
+
         with open(dataset_info_path, 'w') as f:
             yaml.dump(dataset_info, f)
         return True
-    
+
+    def get_nbr_objects(self, dataset_name):
+        segment_dir = self.path_handler.get_labelme_segmentation_path(dataset_name)
+        nbr_objects = 0
+        for segment_file in os.listdir(segment_dir):
+            segment_path = os.path.join(segment_dir, segment_file)
+            segment_info = json.load(open(segment_path, 'r'))
+            nbr_objects+=len(segment_info['shapes'])
+        
+        objects_dir = self.path_handler.get_object_dir(dataset_name)
+        nbr_extracted_objects = len(os.listdir(objects_dir))
+        return {
+            "nbr_objects": nbr_objects,
+            "nbr_extracted_objects": nbr_extracted_objects
+        }
+
     def get_info_by_name(self, dataset_name):
         dataset_info_path = self.path_handler.get_dataset_info_path_by_name(dataset_name)
         dataset_info = yaml.safe_load(open(dataset_info_path, 'r'))
@@ -49,7 +67,9 @@ class DatasetHandler:
         dataset_info['nbr_images'] = len(os.listdir(image_path))
 
         labelme_path = self.path_handler.get_labelme_annotation_path(dataset_name)
+        segment_path = self.path_handler.get_labelme_segmentation_path(dataset_name)
         dataset_info['nbr_auto_annotated'] = len(os.listdir(labelme_path))
+        dataset_info['nbr_segmented'] = len(os.listdir(segment_path))
 
         if dataset_info['preparation_progress'] == 1:
             dataset_info['upload_dataset_progress'] = "Not Yet"

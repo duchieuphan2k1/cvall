@@ -57,6 +57,13 @@ class PathHandler:
             os.mkdir(path)
         return path
 
+    def get_labelme_segmentation_path(self, dataset_name):
+        dataset_path = self.get_dataset_path_by_name(dataset_name)
+        path = os.path.join(dataset_path, self.general_config.path.labelme_segment_annotation_name)
+        if not os.path.exists(path):
+            os.mkdir(path)
+        return path
+
     def get_dataset_path_by_name(self, dataset_name):
         path = os.path.join(self.general_config.path.datasets_dir, dataset_name)
         return path
@@ -79,6 +86,13 @@ class PathHandler:
             os.mkdir(path)
         return path
     
+    def get_object_dir(self, dataset_name):
+        dataset_path = self.get_dataset_path_by_name(dataset_name)
+        path = os.path.join(dataset_path, self.general_config.path.object_dir_name)
+        if not os.path.exists(path):
+            os.mkdir(path)
+        return path
+
     def get_coco_annotation_dir(self, dataset_name):
         dataset_path = self.get_dataset_path_by_name(dataset_name)
         path = os.path.join(dataset_path, self.general_config.path.coco_annotaton_name)
