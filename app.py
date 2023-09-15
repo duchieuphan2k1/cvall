@@ -133,6 +133,27 @@ def upload_video():
     dataset_handler.update_preparation_progress(dataset_name, 2)
     return "Video Uploaded"
 
+@app.route("/upload_background", methods=["POST"])
+def upload_background():
+    background_upload_set = request.form.get("background_upload_set")
+    files = request.files.getlist('background_file[]')
+    print(files)
+
+    background_path = path_handler.get_background_set_by_name(background_upload_set)
+
+    for file in files:
+        if file:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(background_path, filename))
+
+            file_extension = filename.split('.')[-1]
+            if file_extension!="jpg":
+                img = cv2.imread(os.path.join(background_path, filename))
+                cv2.imwrite(os.path.join(background_path, filename.replace(file_extension, 'jpg')), img)
+                os.remove(os.path.join(background_path, filename))
+
+    return "Background Images Uploaded"
+
 @app.route("/data_augment", methods=['GET'])
 def data_augment():
     dataset_name = request.args.get("dataset_name")
@@ -178,6 +199,33 @@ def check_dataset_name():
     if dataset_name in all_datasets:
         return 'false'
     return 'true'
+
+@app.route("/check_background_name", methods=["POST"])
+def check_background_name():
+    background_set_name = request.form.get("background_set_name")
+    all_background_sets = os.listdir(general_cfg.path.background_dir)
+    if background_set_name in all_background_sets:
+        return 'false'
+    return 'true'
+
+@app.route("/add_background_set", methods=["POST"])
+def add_background_set():
+    background_set_name = request.form.get("background_set_name")
+    set_path = path_handler.get_background_set_by_name(background_set_name)
+    os.mkdir(set_path)
+    return 'true'
+
+@app.route("/get_all_background_sets", methods=["POST"])
+def get_all_background_sets():
+    all_background_sets = os.listdir(general_cfg.path.background_dir)
+    return all_background_sets
+
+@app.route("/get_number_background_images", methods=["POST"])
+def get_number_background_images():
+    background_set = request.form.get("background_set")
+    set_path = path_handler.get_background_set_by_name(background_set)
+    nbr_images = len(os.listdir(set_path))
+    return [nbr_images]
 
 @app.route("/add_new_dataset", methods=["POST"])
 def add_new_dataset():
@@ -265,4 +313,4 @@ def download_file():
     file_path = os.path.join(path_handler.get_output_demo_path(), file_name)
     return send_file(file_path, download_name=file_name)
 
-app.run(port=8091, debug=False)
+app.run(port=8091, debug=True)

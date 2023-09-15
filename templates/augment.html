@@ -70,10 +70,106 @@
           <p id="extract_text">Extract objects process is running, wait for a while...</p>
         </strong>
       </div>
-      <button id="extract_button" onclick="start_extract_objects()" style="width: 30%; min-width: 200px;" class="btn btn-warning">Start Extract Objects</button>
+      <button id="extract_button" onclick="start_extract_objects()" style="width: 30%; min-width: 200px;"
+        class="btn btn-warning">Start Extract Objects</button>
     </div>
     <input id="dataset_name" value="{{dataset_name}}" style="display: none;">
   </div>
+  <br>
+  <div class="card text-center">
+    <div class="card-header">
+      <strong>Step 2. Augment Data</strong>
+    </div>
+    <div class="card-body text-center">
+      <h5 class="card-title">Random resize, flip, rotate, re-colorize objects and put them into different background
+        images</h5>
+      <img class="img-fluid" src="static/augment_process.png" alt=""><br> <br>
+
+      <div class="row">
+        <div style="width: 50%; min-width: 300px;">
+          <div class="mb-3">
+            <label for="augmented_dataset_name" class="form-label">Augmented Dataset Name</label>
+            <input oninput="check_augmented_dataset()" value="augmented_{{dataset_name}}" type="text"
+              class="form-control" id="augmented_dataset_name">
+            <div id="name_warning" class="form-text">Please input an unique name for augmented dataset</div>
+          </div>
+          <div class="mb-3">
+            <label for="nbr_augment_images" class="form-label">Number of augment images</label>
+            <input value="3000" type="number" class="form-control" id="nbr_augment_images">
+          </div>
+
+          <div class="row">
+            <div style="width: 45%" class="mb-3">
+              <select onchange="get_bgset_info()" id="background_set" class="form-select" aria-label="">
+                <option value="">--- Select a background set ---</option>
+              </select>
+            </div>
+            <div style="width: 10%;" class="mb-3">
+              <span><strong>Or</strong></span>
+            </div>
+            <div style="width: 45%" class="mb-3">
+              <button type="button" style="width: 100%;" class="btn btn-primary" data-bs-toggle="modal"
+                data-bs-target="#add_background_modal">
+                Add new background set
+              </button>
+
+              <!-- Modal -->
+              <div class="modal fade" id="add_background_modal" tabindex="-1" aria-labelledby="" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="add_background_modalLabel">Add new background set</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label for="new_background_set" class="form-label">Background Set Name</label>
+                        <input oninput="check_background_name()" required type="text" class="form-control"
+                          id="new_background_set">
+                        <div id="bgname_warning" class="form-text">Please input an unique name for background set</div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button id="add_bg_button" onclick="add_background_set()" type="button"
+                        class="btn btn-primary">Add</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="background_info">
+            <p>You are using background set <strong class="background_set_text"></strong>. This background set contains
+              <strong id="number_background"></strong> images.
+            </p>
+
+            <form action="" method="POST" id="background_upload_form" class="row" enctype="multipart/form-data">
+              <label for="file">Add new images to <strong class="background_set_text"></strong></label>
+
+              <div class="input-group mb-3">
+                <input multiple class="form-control" type="file" name="background_file[]" id="background_file">
+                <span type="button" onclick="upload_background()" class="input-group-text" id="basic-addon2">Upload</span>
+              </div>
+              <input name="background_upload_set" id="background_upload_set" type="text" style="display: none;"
+                value="">
+            </form>
+
+          </div>
+        </div>
+        <div style="width: 50%; min-width: 300px;">
+          <label for="generated_dataset_name" class="form-label">Advance Configuration</label>
+        </div>
+      </div>
+
+
+    </div>
+    <div class="card-footer text-muted">
+      <button id="start_augment_button" style="width: 30%; min-width: 200px;" class="btn btn-warning">Start Augment
+        Data</button>
+    </div>
+  </div>
+
   <script>
     $("#augment_progress").addClass("active");
     var status_interval = null;
@@ -165,5 +261,124 @@
       });
     }
 
+    check_augmented_dataset();
+    function check_augmented_dataset() {
+      dataset_name = $("#augmented_dataset_name").val();
+      $.ajax({
+        type: 'POST',
+        url: "{{url_for('check_dataset_name')}}",
+        data: {
+          dataset_name: dataset_name
+        },
+        success: function (resultData) {
+          if (resultData == 'true' && dataset_name != '') {
+            $("#name_warning").text("This name is valid.");
+            $("#name_warning").css("color", "green");
+            $("#start_augment_button").removeAttr("disabled")
+          }
+          else {
+            $("#name_warning").text("This name is existed or invalid.");
+            $("#name_warning").css("color", "red");
+            $("#start_augment_button").attr("disabled", "disabled")
+          }
+        }
+      });
+    }
+
+    check_background_name();
+    function check_background_name() {
+      background_set_name = $("#new_background_set").val();
+      $.ajax({
+        type: 'POST',
+        url: "{{url_for('check_background_name')}}",
+        data: {
+          background_set_name: background_set_name
+        },
+        success: function (resultData) {
+          if (resultData == 'true' && background_set_name != '') {
+            $("#bgname_warning").text("This name is valid.");
+            $("#bgname_warning").css("color", "green");
+            $("#add_bg_button").removeAttr("disabled")
+          }
+          else {
+            $("#bgname_warning").text("This name is existed or invalid.");
+            $("#bgname_warning").css("color", "red");
+            $("#add_bg_button").attr("disabled", "disabled")
+          }
+        }
+      });
+    }
+
+    function add_background_set() {
+      background_set_name = $("#new_background_set").val();
+      $.ajax({
+        type: 'POST',
+        url: "{{url_for('add_background_set')}}",
+        data: {
+          background_set_name: background_set_name
+        },
+        success: function (resultData) {
+          $('#add_background_modal').modal('hide');
+          update_background_choices();
+          alert("Add background set successfully!");
+        }
+      });
+    }
+
+    update_background_choices()
+    function update_background_choices() {
+      $.ajax({
+        type: 'POST',
+        url: "{{url_for('get_all_background_sets')}}",
+        data: { data: 'all' },
+        success: function (resultData) {
+          $("#background_set").empty();
+          $("#background_set").append('<option value="">--- Select a background set ---</option>');
+          for (let i = 0; i < resultData.length; i++) {
+            $("#background_set").append('<option id="bg_' + resultData[i] + '" value="' + resultData[i] + '">' + resultData[i] + '</option>');
+          }
+        }
+      });
+    }
+
+    $("#background_info").hide();
+    function get_bgset_info() {
+      background_set = $("#background_set").val();
+      if (background_set == "") {
+        $("#background_info").hide(200);
+      }
+      else {
+        $.ajax({
+          type: 'POST',
+          url: "{{url_for('get_number_background_images')}}",
+          data: { background_set: background_set },
+          success: function (resultData) {
+            $("#background_info").hide(200);
+            $(".background_set_text").text(background_set);
+            $("#background_upload_set").val(background_set);
+            $("#number_background").text(resultData[0]);
+            $("#background_info").show(200);
+          }
+        });
+      }
+    }
+
+    function upload_background() {
+      var form = $("#background_upload_form")[0];
+      var formData = new FormData(form);
+      $.ajax({
+        url: '/upload_background',
+        type: 'POST',
+        data: formData,
+        success: function (data) {
+          alert(data);
+          get_bgset_info();
+          $('#background_file').val('');
+        },
+        cache: false,
+        contentType: false,
+        processData: false
+      });
+    }
   </script>
 </div>

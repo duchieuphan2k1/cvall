@@ -104,3 +104,8 @@ class PathHandler:
         coco_annotation_dir = self.get_coco_annotation_dir(dataset_name)
         path = os.path.join(coco_annotation_dir, self.general_config.path.coco_annotaton_file)
         return path
+
+    def get_background_set_by_name(self, bg_name):
+        background_dir = self.general_config.path.background_dir
+        path = os.path.join(background_dir, bg_name)
+        return path
