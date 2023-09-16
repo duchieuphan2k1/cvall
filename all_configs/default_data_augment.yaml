@@ -1,0 +1,28 @@
+color:
+  MultiplyHueAndSaturation: [0.5, 1.5]
+  ChangeColorTemperature: [1100, 5000]
+  ChannelShuffle: 0.35
+  Add: [-30, 30]
+  GammaContrast: [0.7, 1.3]
+  MultiplyBrightness: [0.5, 1.5]
+
+resize:
+  small_scale: [5, 7]
+  medium_scale: [7, 25]
+  big_scale: [25, 50]
+
+  small_percent: 40
+  medium_percent: 50
+
+geometry:
+  PerspectiveTransform: [0.01, 0.15],
+  Rotate: [-45, 45],
+  ShearX: [-20, 20],
+  ShearY: [-20, 20]
+  PiecewiseAffine: [0.01, 0.05]
+
+other:
+  number_augment: 200
+  nbr_objects_per_image: [10, 20]
+  accepted_threshold: 50
+  grayscale_ratio: 0.5
