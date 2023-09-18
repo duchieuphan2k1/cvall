@@ -14,11 +14,12 @@ class DatasetHandler:
         self.general_config = self.cfg_handler.get_general_config()
         self.path_handler = PathHandler()
     
-    def create_dataset(self, dataset_name, dataset_secarino, dataset_type, dataset_decs, class_list, augment=0):
+    def create_dataset(self, dataset_name, dataset_secarino, dataset_type, dataset_decs, class_list, augment=0, preparation_progress=1):
         dataset_path = self.path_handler.get_dataset_path_by_name(dataset_name)
         if os.path.exists(dataset_path):
             shutil.rmtree(dataset_path)
         os.mkdir(dataset_path)
+        
         image_path = self.path_handler.get_image_path_by_name(dataset_name)
         os.mkdir(image_path)
 
@@ -28,7 +29,7 @@ class DatasetHandler:
             "dataset_type": dataset_type,
             "dataset_decs": dataset_decs,
             "class_list": class_list,
-            "preparation_progress": 1,
+            "preparation_progress": preparation_progress,
             "created_date": datetime.now().strftime("%m/%d/%Y %H:%M:%S"),
             "augment": augment
         }

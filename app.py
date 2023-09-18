@@ -4,6 +4,7 @@ from utils.handle_path import PathHandler
 from utils.handle_dataset import DatasetHandler
 from utils.handle_model import ModelHandler
 from evaluation.predict_dataset import PredictDataset
+from data_augment.augment_dataset import DatasetAugment
 from damo_yolo2.tools.demo import InferRunner
 from FastSAM2.fastsam_inference import FastFAM_Infer
 import os
@@ -21,6 +22,7 @@ path_handler = PathHandler()
 dataset_handler = DatasetHandler()
 model_handler = ModelHandler()
 fastsam_infer = FastFAM_Infer()
+dataset_augment = DatasetAugment()
 
 @app.route("/")
 def home():
@@ -154,6 +156,13 @@ def upload_background():
 
     return "Background Images Uploaded"
 
+@app.route("/data_explore", methods=['GET'])
+def data_explore():
+    dataset_name = request.args.get("dataset_name")
+    dataset_info = dataset_handler.get_info_by_name(dataset_name)
+
+    return render_template("explore_data.html", dataset_name=dataset_name, dataset_info=dataset_info)
+
 @app.route("/data_augment", methods=['GET'])
 def data_augment():
     dataset_name = request.args.get("dataset_name")
@@ -161,6 +170,51 @@ def data_augment():
     nbr_auto_annotated = dataset_info['nbr_auto_annotated']
     nbr_images = dataset_info['nbr_images']
     return render_template("augment.html", dataset_name=dataset_name, nbr_auto_annotated=nbr_auto_annotated, nbr_images=nbr_images)
+
+@app.route("/start_augment", methods=['POST'])
+def start_augment():
+    # new_augment_config = {
+    #     'color': {
+    #         'MultiplyHueAndSaturation': [float(request.form.get('MultiplyHueAndSaturationMin')), float(request.form.get('MultiplyHueAndSaturationMax'))],
+    #         'ChangeColorTemperature': [int(request.form.get('ChangeColorTemperatureMin')), int(request.form.get('ChangeColorTemperatureMax'))],
+    #         'ChannelShuffle': float(request.form.get('ChannelShuffleMin')),
+    #         'Add': [int(request.form.get('AddMin')), int(request.form.get('AddMax'))],
+    #         'GammaContrast': [float(request.form.get('GammaContrastMin')), float(request.form.get('GammaContrastMax'))],
+    #         'MultiplyBrightness': [float(request.form.get('MultiplyBrightnessMin')), float(request.form.get('MultiplyBrightnessMax'))]
+    #         },
+    #     'resize': {
+    #         'small_scale': [int(request.form.get('small_scale_min')), int(request.form.get('small_scale_max'))],
+    #         'medium_scale': [int(request.form.get('medium_scale_min')), int(request.form.get('medium_scale_max'))],
+    #         'big_scale': [int(request.form.get('big_scale_min')), int(request.form.get('big_scale_max'))],
+    #         'small_percent': int(request.form.get('small_percent')),
+    #         'medium_percent': int(request.form.get('medium_percent'))
+    #     },
+    #     'geometry': {
+    #         'PerspectiveTransform': [float(request.form.get('PerspectiveTransformMin')), float(request.form.get('PerspectiveTransformMax'))],
+    #         'Rotate': [int(request.form.get('RotateMin')), int(request.form.get('RotateMax'))],
+    #         'ShearX': [int(request.form.get('ShearXMin')), int(request.form.get('ShearXMax'))],
+    #         'ShearY': [int(request.form.get('ShearYMin')), int(request.form.get('ShearYMax'))],
+    #         'PiecewiseAffine': [int(request.form.get('PiecewiseAffineMin')), int(request.form.get('PiecewiseAffineMax'))]
+    #     },
+    #     'other': {
+    #         'use_color': int(request.form.get('use_color')),
+    #         'use_geometry': int(request.form.get('use_geometry')),
+    #         'use_resize': int(request.form.get('use_resize')),
+    #         'number_augment': int(request.form.get('number_augment')),
+    #         'nbr_objects_per_image': [int(request.form.get('nbr_objects_per_image_min')), int(request.form.get('nbr_objects_per_image_max'))],
+    #         'accepted_threshold': int(request.form.get('accepted_threshold')),
+    #         'grayscale_ratio': float(request.form.get('grayscale_ratio'))
+    #     }
+    # }
+    augment_dataset_name = request.form.get('augment_dataset_name')
+    origin_dataset_name = request.form.get('origin_dataset_name')
+    background_set_name = request.form.get('background_set_name')
+
+    dataset_augment.create_augment_dataset(origin_dataset_name, augment_dataset_name)
+    # dataset_augment.change_augment_config(augment_dataset_name, new_augment_config)
+    dataset_augment.augment_dataset(augment_dataset_name, origin_dataset_name, background_set_name)
+    dataset_handler.update_preparation_progress(origin_dataset_name, 4)
+    return "Successfully Augment Data"
 
 @app.route("/segment_data", methods=['POST'])
 def segment_data():
@@ -190,6 +244,15 @@ def get_extract_progress():
     nbr_objects = objects_info['nbr_objects']
     nbr_extracted_objects = objects_info['nbr_extracted_objects']
     percent = int(nbr_extracted_objects/nbr_objects*100)
+    return [percent]
+
+@app.route("/get_augment_progress", methods=['POST'])
+def get_augment_progress():
+    augment_dataset_name = request.form.get('augment_dataset_name')
+    augment_info = dataset_augment.load_augment_config_by_name(augment_dataset_name)
+    total_images = augment_info.other.number_augment
+    current_nbr = len(os.listdir(path_handler.get_image_path_by_name(augment_dataset_name)))
+    percent = int(current_nbr/total_images*100)
     return [percent]
 
 @app.route("/check_dataset_name", methods=["POST"])

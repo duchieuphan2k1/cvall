@@ -15,13 +15,16 @@ resize:
   medium_percent: 50
 
 geometry:
-  PerspectiveTransform: [0.01, 0.15],
-  Rotate: [-45, 45],
-  ShearX: [-20, 20],
+  PerspectiveTransform: [0.01, 0.15]
+  Rotate: [-180, 180]
+  ShearX: [-20, 20]
   ShearY: [-20, 20]
   PiecewiseAffine: [0.01, 0.05]
 
 other:
+  use_color: 1
+  use_geometry: 0
+  use_resize: 0
   number_augment: 200
   nbr_objects_per_image: [10, 20]
   accepted_threshold: 50

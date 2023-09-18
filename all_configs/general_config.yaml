@@ -16,3 +16,8 @@ path:
   object_dir_name: objects
   coco_annotaton_name: coco_annotations
   coco_annotaton_file: annotation.json
+
+  augment_yaml_name: augment_info.yaml
+  info_plot_dir: info_plot
+  class_number_plot_name: classes_nbr.jpg
+  image_object_size_ratio: size_ratio.jpg

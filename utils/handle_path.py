@@ -109,3 +109,8 @@ class PathHandler:
         background_dir = self.general_config.path.background_dir
         path = os.path.join(background_dir, bg_name)
         return path
+    
+    def get_augment_config_path(self, augment_dataset_name):
+        augment_dataset_dir = self.get_dataset_path_by_name(augment_dataset_name)
+        path = os.path.join(augment_dataset_dir, self.general_config.path.augment_yaml_name)
+        return path
