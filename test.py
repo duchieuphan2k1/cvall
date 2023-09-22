@@ -1,4 +1,4 @@
-from data_augment.augment_dataset import DatasetAugment
+from utils.handle_dataset import DatasetHandler
 
-dag = DatasetAugment()
-dag.augment_dataset("test_augment", "test01", "default")
+dataset_handler = DatasetHandler()
+dataset_handler.plot_info('test01')

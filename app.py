@@ -7,8 +7,10 @@ from evaluation.predict_dataset import PredictDataset
 from data_augment.augment_dataset import DatasetAugment
 from damo_yolo2.tools.demo import InferRunner
 from FastSAM2.fastsam_inference import FastFAM_Infer
+from base64 import b64encode
 import os
 import cv2
+import shutil
 import ast
 from werkzeug.utils import secure_filename
 
@@ -37,6 +39,22 @@ def review_dataset():
     dataset_name = request.args.get("dataset_name")
     dataset_info = dataset_handler.get_info_by_name(dataset_name)
     return render_template("dataset_overview.html", dataset_name=dataset_name, dataset_info=dataset_info)
+
+@app.route("/review_model")
+def review_model():
+    model_name = request.args.get("model_name")
+    model_info = model_handler.get_model_info_by_name(model_name)
+    model_status_info = model_handler.get_model_status_info_by_name(model_name)
+    return render_template("model_overview.html", model_name=model_name, model_info=model_info, model_status_info=model_status_info)
+
+@app.route("/start_train", methods=['POST'])
+def start_train():
+    model_name = request.form.get("model_name")
+    trainset = request.form.get("trainset")
+    testset = request.form.get("testset")
+    number_epochs = int(request.form.get("number_epochs"))
+    model_handler.update_num_epochs(model_name, number_epochs)
+    return "Done Training"
 
 @app.route("/upload_data")
 def upload_data():
@@ -160,6 +178,18 @@ def upload_background():
 def data_explore():
     dataset_name = request.args.get("dataset_name")
     dataset_info = dataset_handler.get_info_by_name(dataset_name)
+    number_plot_path, size_plot_path = dataset_handler.plot_info(dataset_name)
+
+    static_number_plot_path = os.path.join("static", path_handler.general_config.path.class_number_plot_name)
+    static_size_plot_path = os.path.join("static", path_handler.general_config.path.image_object_size_ratio)
+
+    if os.path.exists(static_number_plot_path):
+        os.remove(static_number_plot_path)
+    if os.path.exists(static_size_plot_path):
+        os.remove(static_size_plot_path)
+
+    shutil.copyfile(number_plot_path, static_number_plot_path)
+    shutil.copyfile(size_plot_path, static_size_plot_path)
 
     return render_template("explore_data.html", dataset_name=dataset_name, dataset_info=dataset_info)
 
@@ -263,6 +293,14 @@ def check_dataset_name():
         return 'false'
     return 'true'
 
+@app.route("/check_model_name", methods=["POST"])
+def check_model_name():
+    model_name = request.form.get("model_name")
+    all_models = os.listdir(general_cfg.path.models_dir)
+    if model_name in all_models:
+        return 'false'
+    return 'true'
+
 @app.route("/check_background_name", methods=["POST"])
 def check_background_name():
     background_set_name = request.form.get("background_set_name")
@@ -308,6 +346,17 @@ def add_new_dataset():
     
     return redirect('/data')
 
+@app.route("/add_new_model", methods=["POST"])
+def add_new_model():
+    if request.method == 'POST':
+        model_name = request.form.get("model_name")
+        trainset = request.form.get("trainset")
+        testset = request.form.get("testset")
+        model_decs = request.form.get("model_decs")
+        model_handler.create_model(model_name, trainset, testset, model_decs)
+    
+    return redirect('/train')
+
 @app.route('/delete_dataset', methods=["POST"])
 def delete_dataset():
     if request.method == 'POST':
@@ -319,9 +368,15 @@ def delete_dataset():
 def get_all_datasets():
     return dataset_handler.get_all_info()
 
+@app.route("/get_all_models", methods=["POST", "GET"])
+def get_all_models():
+    return model_handler.get_all_general_info()
+
 @app.route("/train")
 def train():
-    return render_template("train.html")
+    all_trainset = dataset_handler.get_all_trainset()
+    all_testset = dataset_handler.get_all_testset()
+    return render_template("train.html", all_trainset=all_trainset, all_testset=all_testset)
 
 @app.route("/evaluation")
 def evaluation():

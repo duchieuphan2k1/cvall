@@ -10,6 +10,7 @@ path:
   model_ckpt_name: ckpt
   model_configs_name: configs
   model_yaml_name: params.yaml
+  model_status_name: status.yaml
 
   labelme_annotation_name: labelme_annotations
   labelme_segment_annotation_name: labelme_segment_annotations

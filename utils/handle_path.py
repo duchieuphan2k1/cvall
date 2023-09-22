@@ -7,11 +7,21 @@ class PathHandler:
         self.general_config = self.cfg_handler.get_general_config()
     
     def get_model_params_path_by_name(self, model_name):
-        models_dir = self.general_config.path.models_dir
-        model_path = os.path.join(models_dir, model_name)
+        model_path = self.get_model_dir_by_name(model_name)
         model_yaml_name = self.general_config.path.model_yaml_name
         yaml_path = os.path.join(model_path, model_yaml_name)
         return yaml_path
+
+    def get_model_status_path_by_name(self, model_name):
+        model_path = self.get_model_dir_by_name(model_name)
+        model_status_name = self.general_config.path.model_status_name
+        status_path = os.path.join(model_path, model_status_name)
+        return status_path
+    
+    def get_model_dir_by_name(self, model_name):
+        models_dir = self.general_config.path.models_dir
+        model_path = os.path.join(models_dir, model_name)
+        return model_path
 
     def get_ckpt_path_by_name(self, model_name):
         models_dir = self.general_config.path.models_dir
@@ -113,4 +123,21 @@ class PathHandler:
     def get_augment_config_path(self, augment_dataset_name):
         augment_dataset_dir = self.get_dataset_path_by_name(augment_dataset_name)
         path = os.path.join(augment_dataset_dir, self.general_config.path.augment_yaml_name)
+        return path
+    
+    def get_info_plot_dir(self, dataset_name):
+        dataset_path = self.get_dataset_path_by_name(dataset_name)
+        path = os.path.join(dataset_path, self.general_config.path.info_plot_dir)
+        if not os.path.exists(path):
+            os.mkdir(path)
+        return path
+
+    def get_class_number_plot_path(self, dataset_name):
+        info_plot_dir = self.get_info_plot_dir(dataset_name)
+        path = os.path.join(info_plot_dir, self.general_config.path.class_number_plot_name)
+        return path
+
+    def get_size_plot_path(self, dataset_name):
+        info_plot_dir = self.get_info_plot_dir(dataset_name)
+        path = os.path.join(info_plot_dir, self.general_config.path.image_object_size_ratio)
         return path

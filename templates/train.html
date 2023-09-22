@@ -1,6 +1,146 @@
 {% include 'header.html' %}
+
 <div class="container">
+    <br>
+    <div class="text-center">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#add_model"
+            style="width: 200px;">
+            Create New Model
+        </button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="add_model" tabindex="-1" aria-labelledby="add_modelLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/add_new_model" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="add_modelLabel">Create New model</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label for="model_name" class="form-label">Model Name</label>
+                            <input name="model_name" oninput="check_model()" type="text" class="form-control"
+                                id="model_name" aria-describedby="modelHelp">
+                            <div id="name_warning" class="form-text">Please input an unique name for model</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Train Dataset</label>
+                            <select class="form-select" id="trainset" name="trainset"
+                                aria-label="Train Dataset">
+                            {% for trainset in all_trainset %}
+                            <option value="{{trainset}}">{{trainset}}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Test Dataset</label>
+                            <select class="form-select" id="testset" name="testset"
+                                aria-label="Valid Dataset">
+                            {% for testset in all_testset %}
+                            <option value="{{testset}}">{{testset}}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="model_decs" class="form-label">Model Description</label>
+                            <textarea name="model_decs" type="text" class="form-control" id="model_decs"></textarea>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" id="create_button" type="button" class="btn btn-primary"
+                            disabled>Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <br>
+    <table id="model_table" class="display" style="width: 100%;">
+        <thead>
+            <tr>
+                <th>Model Name</th>
+                <th>Train Set</th>
+                <th>Test Set</th>
+                <th>Description</th>
+                <th>Created Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
     <script>
+        var class_i = 0;
         $("#training_link").addClass("active");
+        // $(document).ready(function () {
+        //     $('#model_table').DataTable();
+        // });
+        $(document).ready(function () {
+            fetch('/get_all_models').then(response => {
+                return response.json();
+            }).then(results => {
+                console.log(results);
+                table = $('#model_table').DataTable({
+                    "data": results,
+                    "columns": [
+                        { "data": "model_name"},
+                        { "data": "trainset"},
+                        { "data": "testset"},
+                        { "data": "desc"},
+                        { "data": "created_date"},
+                        { "": null }
+                    ],
+                    "columnDefs": [
+                        {
+                            targets: -1,
+                            "searchable": false,
+                            "orderable": false,
+                            render: function (data, type, row, meta) {
+                                console.log(row['row_id']);
+                                start_div = "<div class='row'>"
+                                review_button = '<div style="width:50%"><a style="width:100%" class="btn btn-info" href="/review_model?model_name='+row['model_name']+'"><i class="far fa-edit"></i></a></div>'
+                                delete_button = '<div style="width:50%"><form style="width:100%" action="delete_model" method="POST"><button style="width:100%" name="dl_model" type="submit" class="btn btn-danger dl_model" value="' + row['model_name'] + '""><i class="far fa-trash-alt"></i></button></form></div>';
+                                end_div = "</div>"
+                                return start_div+review_button+delete_button+end_div;
+                            }
+                        }
+                    ]
+                });
+            });
+        });
+
+
+        function check_model() {
+            model_name = $("#model_name").val();
+            $.ajax({
+                type: 'POST',
+                url: "/check_model_name",
+                data: {
+                    model_name: model_name
+                },
+                success: function (resultData) {
+                    if (resultData == 'true' && model_name != '') {
+                        $("#name_warning").text("This name is valid.");
+                        $("#name_warning").css("color", "green");
+                        $("#create_button").removeAttr("disabled")
+                    }
+                    else {
+                        $("#name_warning").text("This name is existed or invalid.");
+                        $("#name_warning").css("color", "red");
+                        $("#create_button").attr("disabled", "disabled")
+                    }
+                }
+            });
+        }
+
     </script>
+
 </div>
