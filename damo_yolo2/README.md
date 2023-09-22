@@ -138,10 +138,10 @@ Step1. Download a pretrained torch, onnx or tensorRT engine from the benchmark t
 Step2. Use -f(config filename) to specify your detector's config, --path to specify input data path, image/video/camera are supported. For example:
 ```shell
 # torch engine with image
-python damo-yolo/tools/demo.py image -f damo-yolo/configs/damoyolo_tinynasL25_S.py --engine models/damoyolo_tinynasL25_S_477.pth --conf 0.6 --infer_size 640 640 --device cpu --path damo-yolo/assets/dog.jpg
+python tools/demo.py image -f ./configs/damoyolo_tinynasL25_S.py --engine ./damoyolo_tinynasL25_S.pth --conf 0.6 --infer_size 640 640 --device cuda --path ./assets/dog.jpg
 
 # onnx engine with video
-python damo-yolo/tools/demo.py video -f damo-yolo/configs/damoyolo_tinynasL25_S.py --engine models/damoyolo_tinynasL25_S_477.pth --conf 0.6 --infer_size 640 640 --device cpu --path datasets/demo_stuff/demo_video1.mp4
+python tools/demo.py video -f ./configs/damoyolo_tinynasL25_S.py --engine ./damoyolo_tinynasL25_S.onnx --conf 0.6 --infer_size 640 640 --device cuda --path your_video.mp4
 
 # tensorRT engine with camera
 python tools/demo.py camera -f ./configs/damoyolo_tinynasL25_S.py --engine ./damoyolo_tinynasL25_S.trt --conf 0.6 --infer_size 640 640 --device cuda --camid 0
