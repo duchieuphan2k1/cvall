@@ -5,12 +5,20 @@ path:
   demo_output_name: predicted
   image_dir_name: images
   dataset_info_file: dataset_info.yaml
+  results_dir_name: temp_results
 
   models_dir: models
   model_ckpt_name: ckpt
   model_configs_name: configs
   model_yaml_name: params.yaml
-  model_status_name: status.yaml
+
+  evaluation_dir: experiments
+  pred_labelme_dir: pred_labelme
+  all_results_file_name: all_results.json
+  precision_plot_dir: precision_plot
+  model_status_file_name: status.json
+  accuracy_image_name: valid_acc.jpg
+  loss_image_name: train_loss.jpg
 
   labelme_annotation_name: labelme_annotations
   labelme_segment_annotation_name: labelme_segment_annotations

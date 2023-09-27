@@ -57,8 +57,8 @@ class COCODataset(CocoDetection):
         target = BoxList(boxes, img.size, mode='xywh').convert('xyxy')
 
         classes = [obj['category_id'] for obj in anno]
-        classes = [self.contiguous_class2id[self.ori_id2class[c]] 
-                   for c in classes]
+        # classes = [self.contiguous_class2id[self.ori_id2class[c]] 
+        #            for c in classes]
 
         classes = torch.tensor(classes)
         target.add_field('labels', classes)
@@ -86,8 +86,8 @@ class COCODataset(CocoDetection):
         target = target.clip_to_image(remove_empty=True)
 
         classes = [obj['category_id'] for obj in anno]
-        classes = [self.contiguous_class2id[self.ori_id2class[c]] 
-                   for c in classes]
+        # classes = [self.contiguous_class2id[self.ori_id2class[c]] 
+        #            for c in classes]
 
         obj_masks = []
         for obj in anno:
@@ -115,8 +115,8 @@ class COCODataset(CocoDetection):
         _, anno = super(COCODataset, self).__getitem__(idx)
         anno = [obj for obj in anno if obj['iscrowd'] == 0]
         classes = [obj['category_id'] for obj in anno]
-        classes = [self.contiguous_class2id[self.ori_id2class[c]] 
-                   for c in classes]
+        # classes = [self.contiguous_class2id[self.ori_id2class[c]] 
+        #            for c in classes]
 
         return classes
 

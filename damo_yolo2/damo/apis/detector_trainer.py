@@ -22,6 +22,9 @@ from damo.utils import (MeterBuffer, get_model_info, get_rank, gpu_mem_usage,
 
 from torch.nn import GroupNorm, LayerNorm
 from torch.nn.modules.batchnorm import _BatchNorm
+# from evaluation.predict_dataset import PredictDataset
+from utils.handle_path import PathHandler
+from utils.handle_status import StatusHandler
 NORMS = (GroupNorm, LayerNorm, _BatchNorm)
 
 def mkdir(path):
@@ -87,14 +90,23 @@ class ema_model:
 
 
 class Trainer:
-    def __init__(self, cfg, args, tea_cfg=None, is_train=True):
+    def __init__(self, cfg, PredictDataset, tea_cfg=None, is_train=True):
         self.cfg = cfg
         self.tea_cfg = tea_cfg
-        self.args = args
+        # self.args = args
         self.output_dir = cfg.miscs.output_dir
         self.exp_name = cfg.miscs.exp_name
-        self.device = 'cuda'
+        self.device = 'cpu'
 
+        self.testset = cfg.dataset.testset
+        self.model_name = cfg.model_name
+        self.PredictDataset = PredictDataset
+        self.predict_dataset = None
+        self.path_handler = PathHandler()
+        self.ckpt_dir = self.path_handler.get_ckpt_dir_by_name(self.model_name)
+       
+        self.status_handler = StatusHandler(self.model_name)
+        self.status_handler.create_status()
         # set_seed(cfg.miscs.seed)
         # metric record
         self.meter = MeterBuffer(window_size=cfg.miscs.print_interval_iters)
@@ -104,14 +116,14 @@ class Trainer:
         if get_rank() == 0:
             os.makedirs(self.file_name, exist_ok=True)
 
-        setup_logger(
-            self.file_name,
-            distributed_rank=get_rank(),
-            mode='w',
-            )
+        # setup_logger(
+        #     self.file_name,
+        #     distributed_rank=get_rank(),
+        #     mode='w',
+        #     )
 
         # logger
-        logger.info('args info: {}'.format(self.args))
+        # logger.info('args info: {}'.format(self.args))
         logger.info('cfg value:\n{}'.format(self.cfg))
 
         # build model
@@ -267,7 +279,8 @@ class Trainer:
             get_model_info(self.model, (infer_shape, infer_shape))))
 
         # distributed model init
-        self.model = build_ddp_model(self.model, local_rank)
+        # self.model = build_ddp_model(self.model, local_rank)
+        
         logger.info('Model: {}'.format(self.model))
 
         logger.info('Training start...')
@@ -276,9 +289,11 @@ class Trainer:
         self.model.train()
         iter_start_time = time.time()
         iter_end_time = time.time()
+        
+        print(len(self.train_loader))
+        best_accuracy = 0
         for data_iter, (inps, targets, ids) in enumerate(self.train_loader):
             cur_iter = self.start_iter + data_iter
-
             lr = self.lr_scheduler.get_lr(cur_iter)
             for param_group in self.optimizer.param_groups:
                 param_group['lr'] = lr
@@ -304,7 +319,6 @@ class Trainer:
                 outputs['distill_loss'] = distill_loss
 
             else:
-
                 outputs = self.model(inps, targets)
                 loss = outputs['total_loss']
 
@@ -372,44 +386,59 @@ class Trainer:
                     inps.tensors.shape[2], inps.tensors.shape[3], eta_str)))
                 self.meter.clear_meters()
 
-            if (cur_iter + 1) % self.ckpt_interval_iters == 0:
-                self.save_ckpt('epoch_%d' % (self.epoch + 1),
-                               local_rank=local_rank)
+            # if (cur_iter + 1) % self.ckpt_interval_iters == 0:
+            #     self.save_ckpt_cpu('epoch_%d.pth' % (self.epoch + 1),
+            #                    local_rank=local_rank)
+            if not os.path.exists(os.path.join(self.ckpt_dir, 'model.pth')):
+                self.save_ckpt_cpu(os.path.join(self.ckpt_dir, 'model.pth'), local_rank=local_rank)
+            if self.predict_dataset == None:
+                self.predict_dataset = self.PredictDataset(self.testset, self.model_name)
 
             if (cur_iter + 1) % self.eval_interval_iters == 0:
-                time.sleep(0.003)
-                self.evaluate(local_rank, self.cfg.dataset.val_ann)
-                self.model.train()
+                self.save_ckpt_cpu('temp.pth', local_rank=local_rank)
+                current_accuracy = self.predict_dataset.run_pred(ckpt_path='temp.pth')
+                current_accuracy = self.predict_dataset.eval_results(return_accuracy=True)
+                self.status_handler.update_process(self.epoch, current_accuracy, loss.item())
+                if current_accuracy > best_accuracy:
+                    self.save_ckpt_cpu(os.path.join(self.ckpt_dir, 'model.pth'), local_rank=local_rank)
             synchronize()
+            status_info = self.status_handler.get_info()
+            if status_info['terminating']:
+                break
 
             if (cur_iter + 1) % self.iters_per_epoch == 0:
                 self.epoch = self.epoch + 1
 
-        self.save_ckpt(ckpt_name='latest', local_rank=local_rank)
+        if status_info['training_status'] == 'training':
+            self.status_handler.complete_training()
+        # self.save_ckpt(ckpt_name='latest', local_rank=local_rank)
+
+    def save_ckpt_cpu(self, ckpt_name, local_rank, update_best_ckpt=False):
+        torch.save(self.model.state_dict(), ckpt_name)
 
     def save_ckpt(self, ckpt_name, local_rank, update_best_ckpt=False):
-        if local_rank == 0:
-            if self.ema_model is not None:
-                save_model = self.ema_model.model
-            else:
-                save_model = self.model.module
-            logger.info('Save weights to {}'.format(self.file_name))
-            ckpt_state = {
-                'epoch':
-                self.epoch + 1,
-                'model':
-                save_model.state_dict(),
-                'optimizer':
-                self.optimizer.state_dict(),
-                'feature_loss':
-                self.feature_loss.state_dict() if self.distill else None,
-            }
-            save_checkpoint(
-                ckpt_state,
-                update_best_ckpt,
-                self.file_name,
-                ckpt_name,
-            )
+        # if local_rank == 0:
+        if self.ema_model is not None:
+            save_model = self.ema_model.model
+        else:
+            save_model = self.model.module
+        logger.info('Save weights to {}'.format(self.file_name))
+        ckpt_state = {
+            'epoch':
+            self.epoch + 1,
+            'model':
+            save_model.state_dict(),
+            'optimizer':
+            self.optimizer.state_dict(),
+            'feature_loss':
+            self.feature_loss.state_dict() if self.distill else None,
+        }
+        save_checkpoint(
+            ckpt_state,
+            update_best_ckpt,
+            self.file_name,
+            ckpt_name,
+        )
 
     def resume_model(self, resume_path, load_optimizer=False):
         ckpt_file_path = resume_path

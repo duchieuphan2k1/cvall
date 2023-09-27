@@ -16,18 +16,18 @@ from .augmentations import test_aug, train_aug
 from .paths_catalog import DatasetCatalog
 
 miscs = easydict({
-    'print_interval_iters': 50,    # print interval
+    'print_interval_iters': 5,    # print interval
     'output_dir': './workdirs',    # save dir
     'exp_name': os.path.split(os.path.realpath(__file__))[1].split('.')[0],
     'seed': 1234,                  # rand seed for initialize
-    'eval_interval_epochs': 10,    # evaluation interval
-    'ckpt_interval_epochs': 10,    # ckpt saving interval
+    'eval_interval_epochs': 1,    # evaluation interval
+    'ckpt_interval_epochs': 1,    # ckpt saving interval
     'num_workers': 4,
 })
 
 train = easydict({
     # ema
-    'ema': True,                   # enable ema
+    'ema': False,                   # enable ema
     'ema_momentum': 0.9998,        # ema momentum
     'warmup_start_lr': 0,          # warmup start learning rate
     # scheduler

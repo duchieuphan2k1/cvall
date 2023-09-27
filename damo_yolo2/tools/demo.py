@@ -2,13 +2,15 @@
 
 import argparse
 import os
-
+import subprocess
 import cv2
 import numpy as np
+import time
+import shutil
 import torch
 from loguru import logger
 from PIL import Image
-
+from tqdm import tqdm
 from damo.base_models.core.ops import RepConv
 from damo.config.base import parse_config
 from damo.detectors.detector import build_local_model
@@ -73,7 +75,11 @@ class Infer():
         if engine_type == 'torch':
             model = build_local_model(config, self.device)
             ckpt = torch.load(self.ckpt_path, map_location=self.device)
-            model.load_state_dict(ckpt['model'], strict=True)
+            try:
+                model.load_state_dict(ckpt['model'], strict=True)
+            except:
+                model.load_state_dict(ckpt, strict=True)
+
             for layer in model.modules():
                 if isinstance(layer, RepConv):
                     layer.switch_to_deploy()
@@ -253,104 +259,55 @@ class Infer():
             cv2.imwrite(save_path, vis_img[:, :, ::-1])
         return vis_img
 
+class InferRunner():
+    def __init__(self, config_file, engine, output_dir='./', infer_size=[1024, 1024], conf=0.6, device="cpu"):
+        self.config_file = config_file
+        self.infer_size = infer_size
+        self.conf = conf
+        self.engine = engine
+        self.device = device
+        config = parse_config(self.config_file)
+        self.output_dir = output_dir
+        self.infer_engine = Infer(config, infer_size=self.infer_size, device=self.device,
+            output_dir=output_dir, ckpt=self.engine, end2end=False)
 
-def make_parser():
-    parser = argparse.ArgumentParser('DAMO-YOLO Demo')
+    def predict(self, origin_img):
+        bboxes, scores, cls_inds = self.infer_engine.forward(origin_img)
+        return bboxes, scores, cls_inds
 
-    parser.add_argument('input_type',
-                        default='image',
-                        help="input type, support [image, video, camera]")
-    parser.add_argument('-f',
-                        '--config_file',
-                        default=None,
-                        type=str,
-                        help='pls input your config file',)
-    parser.add_argument('-p',
-                        '--path',
-                        default='./assets/dog.jpg',
-                        type=str,
-                        help='path to image or video')
-    parser.add_argument('--camid',
-                        type=int,
-                        default=0,
-                        help='camera id, necessary when input_type is camera')
-    parser.add_argument('--engine',
-                        default=None,
-                        type=str,
-                        help='engine for inference')
-    parser.add_argument('--device',
-                        default='cuda',
-                        type=str,
-                        help='device used to inference')
-    parser.add_argument('--output_dir',
-                        default='./demo',
-                        type=str,
-                        help='where to save inference results')
-    parser.add_argument('--conf',
-                        default=0.6,
-                        type=float,
-                        help='conf of visualization')
-    parser.add_argument('--infer_size',
-                        nargs='+',
-                        type=int,
-                        help='test img size')
-    parser.add_argument('--end2end',
-                        action='store_true',
-                        help='trt engine with nms')
-    parser.add_argument('--save_result',
-                        default=True,
-                        type=bool,
-                        help='whether save visualization results')
+    def run_image(self, image_path):
+        origin_img = np.asarray(Image.open(image_path).convert('RGB'))
+        start = time.time()
+        bboxes, scores, cls_inds = self.infer_engine.forward(origin_img)
+        inf_time = time.time() - start
+        vis_res = self.infer_engine.visualize(origin_img, bboxes, scores, cls_inds, conf=self.conf, save_name=os.path.basename(image_path), save_result=True)
+        return inf_time
 
-
-    return parser
-
-
-@logger.catch
-def main():
-    args = make_parser().parse_args()
-    config = parse_config(args.config_file)
-    input_type = args.input_type
-
-    infer_engine = Infer(config, infer_size=args.infer_size, device=args.device,
-        output_dir=args.output_dir, ckpt=args.engine, end2end=args.end2end)
-
-    if input_type == 'image':
-        origin_img = np.asarray(Image.open(args.path).convert('RGB'))
-        bboxes, scores, cls_inds = infer_engine.forward(origin_img)
-        vis_res = infer_engine.visualize(origin_img, bboxes, scores, cls_inds, conf=args.conf, save_name=os.path.basename(args.path), save_result=args.save_result)
-        if not args.save_result:
-            cv2.namedWindow("DAMO-YOLO", cv2.WINDOW_NORMAL)
-            cv2.imshow("DAMO-YOLO", vis_res)
-
-    elif input_type == 'video' or input_type == 'camera':
-        cap = cv2.VideoCapture(args.path if input_type == 'video' else args.camid)
+    def run_video(self, video_path):
+        cap = cv2.VideoCapture(video_path)
         width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
         height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
         fps = cap.get(cv2.CAP_PROP_FPS)
-        if args.save_result:
-            save_path = os.path.join(args.output_dir, os.path.basename(args.path))
-            print(f'inference result will be saved at {save_path}')
-            vid_writer = cv2.VideoWriter(
-                save_path, cv2.VideoWriter_fourcc(*"mp4v"),
-                fps, (int(width), int(height)))
-        while True:
+        nbr_frame = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+            
+        save_path = os.path.join(self.output_dir, os.path.basename(video_path))
+
+        print(f'inference result will be saved at {save_path}')
+        vid_writer = cv2.VideoWriter(
+            save_path, cv2.VideoWriter_fourcc(*'mp4v'),
+            fps, (int(width), int(height)))
+        
+        start = time.time()
+        for i in tqdm(range(int(nbr_frame))):
             ret_val, frame = cap.read()
             if ret_val:
-                bboxes, scores, cls_inds = infer_engine.forward(frame)
-                result_frame = infer_engine.visualize(frame, bboxes, scores, cls_inds, conf=args.conf, save_result=False)
-                if args.save_result:
-                    vid_writer.write(result_frame)
-                else:
-                    cv2.namedWindow("DAMO-YOLO", cv2.WINDOW_NORMAL)
-                    cv2.imshow("DAMO-YOLO", result_frame)
-                ch = cv2.waitKey(1)
-                if ch == 27 or ch == ord("q") or ch == ord("Q"):
-                    break
-            else:
-                break
-
-
-
-if __name__ == '__main__':
-    main()
+                bboxes, scores, cls_inds = self.infer_engine.forward(frame)
+                result_frame = self.infer_engine.visualize(frame, bboxes, scores, cls_inds, conf=self.conf, save_result=False)
+                vid_writer.write(result_frame)
+        inf_time = time.time() - start
+        vid_writer.release()
+        outsave_path = os.path.join(self.output_dir, "out_" + os.path.basename(video_path))
+        if os.path.exists(outsave_path):
+            os.remove(outsave_path)
+        subprocess.run("ffmpeg -i {} -vcodec libx264 -f mp4 {}".format(save_path, outsave_path), shell=True)
+        return inf_time

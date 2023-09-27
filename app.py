@@ -3,11 +3,16 @@ from utils.handle_config import ConfigHandler
 from utils.handle_path import PathHandler
 from utils.handle_dataset import DatasetHandler
 from utils.handle_model import ModelHandler
+from utils.handle_status import StatusHandler
 from evaluation.predict_dataset import PredictDataset
 from data_augment.augment_dataset import DatasetAugment
 from damo_yolo2.tools.demo import InferRunner
 from FastSAM2.fastsam_inference import FastFAM_Infer
-from base64 import b64encode
+from evaluation.predict_dataset import PredictDataset
+from damo_yolo2.damo.apis import Trainer
+from damo_yolo2.damo.config.base import parse_config
+import matplotlib.pyplot as plt
+import json
 import os
 import cv2
 import shutil
@@ -43,9 +48,51 @@ def review_dataset():
 @app.route("/review_model")
 def review_model():
     model_name = request.args.get("model_name")
+    status_handler = StatusHandler(model_name)
     model_info = model_handler.get_model_info_by_name(model_name)
-    model_status_info = model_handler.get_model_status_info_by_name(model_name)
+    model_status_info = status_handler.get_info()
     return render_template("model_overview.html", model_name=model_name, model_info=model_info, model_status_info=model_status_info)
+
+@app.route("/get_training_status", methods=["POST"])
+def get_training_status():
+    model_name = request.form.get("model_name")
+    status_handler = StatusHandler(model_name)
+    model_status_info = status_handler.get_info()
+    epochs = []
+    results = []
+    losses = []
+    for epoch_result in model_status_info['training_info']:
+        epochs.append(epoch_result['epoch'])
+        results.append(epoch_result['valid_accuracy'])
+        losses.append(epoch_result['train_loss'])
+    
+    if len(epochs) == 0:
+        epochs = [0]
+        results = [0]
+        losses = [0]
+
+    accuracy_image_path = os.path.join("static", general_cfg.path.accuracy_image_name)
+    loss_image_path = os.path.join("static", general_cfg.path.loss_image_name)
+
+    plt.plot(epochs, results, marker='o', label='Accuracy on test set')
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy")
+    plt.legend()
+    plt.savefig(accuracy_image_path)
+    plt.close()
+
+    plt.plot(epochs, losses, marker='o', label='Training Loss')
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.savefig(loss_image_path)
+    plt.close()
+
+    response_data = {
+        "image_path": [accuracy_image_path, loss_image_path],
+        "current_epoch": epochs[-1]
+        }
+    return response_data
 
 @app.route("/start_train", methods=['POST'])
 def start_train():
@@ -54,7 +101,18 @@ def start_train():
     testset = request.form.get("testset")
     number_epochs = int(request.form.get("number_epochs"))
     model_handler.update_num_epochs(model_name, number_epochs)
+    dataset_handle = DatasetHandler()
+    dataset_handle.labelme_to_coco(testset)
+    dataset_handle.labelme_to_coco(trainset)
+    os.system("python wrap_training.py --model_name {}".format(model_name))
     return "Done Training"
+
+@app.route("/terminate_training", methods=['POST'])
+def terminate_training():
+    model_name = request.form.get("model_name")
+    status_handler = StatusHandler(model_name)
+    status_handler.terminate_process()
+    return ""
 
 @app.route("/upload_data")
 def upload_data():
@@ -99,6 +157,57 @@ def get_auto_annotation_progress():
     nbr_images = dataset_info['nbr_images']
     percent = int(nbr_auto_annotated/nbr_images*100)
     return [percent]
+
+@app.route("/get_evaluation_progress", methods=['POST'])
+def get_evaluation_progress():
+    dataset_name = request.form.get('dataset_name')
+    model_name = request.form.get('model_name')
+    pred_labelme_dir = path_handler.get_pred_labelme_dir(model_name, dataset_name)
+    image_dir = path_handler.get_image_path_by_name(dataset_name)
+    nbr_preded = len(os.listdir(pred_labelme_dir))
+    nbr_images = len(os.listdir(image_dir))
+
+    percent = int(nbr_preded/nbr_images*100)
+    return [percent]
+
+@app.route("/view_results", methods=['GET'])
+def view_results():
+    dataset_name = request.args.get("dataset_name")
+    model_name = request.args.get("model_name")
+    static_results_dir = os.path.join("static", general_cfg.path.results_dir_name)
+    if os.path.exists(static_results_dir):
+        shutil.rmtree(static_results_dir)
+    os.mkdir(static_results_dir)
+    precision_plot_dir = path_handler.get_precision_plot_dir(model_name, dataset_name)
+    image_list = os.listdir(precision_plot_dir)
+    path_list = []
+    average_precision = json.load(open(path_handler.get_result_file_path(model_name, dataset_name), 'r'))['avg_precision']
+    for image_name in image_list:
+        img = cv2.imread(os.path.join(precision_plot_dir, image_name))
+        cv2.imwrite(os.path.join(static_results_dir, image_name), img)
+        path_list.append(os.path.join(static_results_dir, image_name))
+
+    return render_template("view_results.html", path_list=path_list, average_precision=average_precision, dataset_name=dataset_name, model_name=model_name)
+
+@app.route("/get_all_evaluations", methods=["POST", "GET"])
+def get_all_evaluations():
+    experiment_dir = general_cfg.path.evaluation_dir
+    all_models = os.listdir(experiment_dir)
+    evaluation_info = []
+    for model_name in all_models:
+        model_exp_path = os.path.join(experiment_dir, model_name)
+        exp_datasets = os.listdir(model_exp_path)
+        for dts in exp_datasets:
+            result_file_path = path_handler.get_result_file_path(model_name, dts)
+            if os.path.exists(result_file_path):
+                avg_precision = json.load(open(result_file_path, 'r'))['avg_precision']
+                evaluation_info.append({
+                    'model_name': model_name,
+                    'dataset_name': dts,
+                    'avg_precision': avg_precision
+                })
+    return evaluation_info
+
 
 @app.route("/review_label", methods=["POST"])
 def review_label():
@@ -364,6 +473,21 @@ def delete_dataset():
         dataset_handler.delete_dataset(dataset_name)
     return redirect("/data")
 
+@app.route('/delete_model', methods=["POST"])
+def delete_model():
+    model_name = request.form.get("dl_model")
+    model_handler.delete_model(model_name)
+    return redirect("/train")
+
+@app.route('/delete_evaluation', methods=["POST"])
+def delete_evaluation():
+    model_name = request.form.get("dl_model_name")
+    dataset_name = request.form.get("dl_dataset_name")
+    path = path_handler.get_evaluation_folder(model_name, dataset_name)
+    if os.path.exists(path):
+        shutil.rmtree(path)
+    return redirect("/evaluation")
+
 @app.route("/get_all_datasets", methods=["POST", "GET"])
 def get_all_datasets():
     return dataset_handler.get_all_info()
@@ -380,7 +504,20 @@ def train():
 
 @app.route("/evaluation")
 def evaluation():
-    return render_template("evaluation.html")
+    all_testsets = dataset_handler.get_all_testset()
+    models_dir = general_cfg.path.models_dir
+    all_models = os.listdir(models_dir)    
+    return render_template("evaluation.html", all_testsets=all_testsets, all_models=all_models)
+
+@app.route("/start_evaluate", methods=["POST"])
+def start_evaluate():
+    dataset_name = request.form.get('dataset_name')
+    model_name = request.form.get('model_name')
+    predict_dataset = PredictDataset(dataset_name, model_name)
+    predict_dataset.run_pred()
+    predict_dataset.eval_results(plot=True)
+    return "Done Evaluation"
+
 
 @app.route("/demo")
 def demo():

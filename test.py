@@ -1,4 +1,6 @@
-from utils.handle_dataset import DatasetHandler
+from evaluation.predict_dataset import PredictDataset
 
-dataset_handler = DatasetHandler()
-dataset_handler.plot_info('test01')
+predict_dataset = PredictDataset("test01", "base_model")
+predict_dataset.run_pred()
+predict_dataset.eval_results(plot=True)
+

@@ -2,6 +2,7 @@ from utils.handle_config import ConfigHandler
 from utils.handle_path import PathHandler
 from utils.handle_dataset import DatasetHandler
 import os
+import shutil
 import yaml
 from datetime import datetime
 
@@ -12,6 +13,7 @@ class ModelHandler:
         self.general_config = self.cfg_handler.get_general_config()
         self.path_handler = PathHandler()
         self.default_params = {
+            'model_name': None,
             'desc': None,
             'created_date': None,
             'miscs': {
@@ -54,19 +56,6 @@ class ModelHandler:
                 }
             }
         }
-
-    def get_model_info_by_name(self, model_name):
-        params_path = self.path_handler.get_model_params_path_by_name(model_name)
-        model_params = yaml.safe_load(open(params_path, 'r'))
-        return model_params
-    
-    def get_model_status_info_by_name(self, model_name):
-        status_path = self.path_handler.get_model_status_path_by_name(model_name)
-        if not os.path.exists(status_path):
-            return None
-
-        model_status = yaml.safe_load(open(model_status, 'r'))
-        return model_status
     
     def get_classes_by_name(self, model_name):
         model_params = self.get_model_info_by_name(model_name)
@@ -78,6 +67,7 @@ class ModelHandler:
         os.mkdir(model_dir)
 
         model_params = self.default_params
+        model_params['model_name'] = model_name
         model_params['dataset']['trainset'] = trainset
         model_params['dataset']['testset'] = testset
         model_params['desc'] = desc
@@ -86,8 +76,22 @@ class ModelHandler:
 
         model_params_path = self.path_handler.get_model_params_path_by_name(model_name)
         self.cfg_handler.dump_config_by_path(model_params_path, model_params)
+
+        base_config_path = self.path_handler.get_config_path_by_name("base_model")
+        config_dir = self.path_handler.get_config_dir_by_name(model_name)
+        shutil.copy2(base_config_path, config_dir)
         return True
-    
+
+    def delete_model(self, model_name):
+        model_dir = self.path_handler.get_model_dir_by_name(model_name)
+        if os.path.exists(model_dir):
+            shutil.rmtree(model_dir)
+        
+        model_experiment_dir = self.path_handler.get_model_exp_dir_by_name(model_name)
+        if os.path.exists(model_experiment_dir):
+            shutil.rmtree(model_experiment_dir)
+        return True
+
     def update_num_epochs(self, model_name, number_epochs):
         model_params_path = self.path_handler.get_model_params_path_by_name(model_name)
         model_params = yaml.safe_load(open(model_params_path, 'r'))

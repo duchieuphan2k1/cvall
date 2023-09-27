@@ -1,12 +1,35 @@
 {% include 'header.html' %}
 
 <div class="container">
-    {% if model_status_info != None %}
-    DO SOMETHING
-    {% endif %}
-    <div class="card text-center">
+    <div id="tracking_training">
+        <div id="model_loader">
+            <div class="d-flex align-items-center justify-content-center">
+                <img style="height: 300px;" class="img-fluid" src="static/training.gif" alt="">
+            </div>
+            <div class="text-center">
+                <h5>Epoch: <strong id="current_epoch_text"></strong> / <strong
+                        id="total_epochs_text">{{model_info['train']['total_epochs']}}</strong>
+                </h5>
+            </div>
+            <br>
+            <div class="text-center">
+                <button style="width: 200px;" class="btn btn-danger" onclick="terminate_training()">Terminate Training</button>
+            </div>
+            <br>
+        </div>
+
+        <div>
+            <div class="text-center">
+                <h5>Training Results...</h5>
+            </div>
+            <div id="result_images">
+            </div>
+        </div>
+    </div>
+
+    <div class="card text-center" id="training_action">
         <div class="card-header">
-            Featured
+            <strong>{{model_name}}</strong>
         </div>
         <div class="card-body">
             <h5 class="card-title">Training for <strong>{{model_name}}</strong></h5>
@@ -14,31 +37,77 @@
             <div class="d-flex align-items-center justify-content-center">
                 <div style="width: 200px; margin-right: 10px;" class="mb-3">
                     <label for="trainset" class="form-label">Train Dataset</label>
-                    <input type="text" value="{{model_info['dataset']['trainset']}}" class="form-control" id="trainset" aria-describedby="trainset" readonly>
+                    <input type="text" value="{{model_info['dataset']['trainset']}}" class="form-control" id="trainset"
+                        aria-describedby="trainset" readonly>
                 </div>
                 <div style="width: 200px;" class="mb-3">
                     <label for="testset" class="form-label">Test Dataset</label>
-                    <input type="text" value="{{model_info['dataset']['testset']}}" class="form-control" id="testset" aria-describedby="testset" readonly>
+                    <input type="text" value="{{model_info['dataset']['testset']}}" class="form-control" id="testset"
+                        aria-describedby="testset" readonly>
                 </div>
             </div>
             <div class="d-flex align-items-center justify-content-center">
                 <div style="width: 200px;" class="mb-3">
                     <label for="number_epochs" class="form-label">Number of Epochs</label>
-                    <input type="number" class="form-control" value="{{model_info['train']['total_epochs']}}" id="number_epochs" aria-describedby="number_epochsHelp">
+                    <input type="number" class="form-control" value="{{model_info['train']['total_epochs']}}"
+                        id="number_epochs" aria-describedby="number_epochsHelp">
                 </div>
             </div>
         </div>
         <div class="card-footer text-muted">
-            <a href="#" style="width: 200px;" id="start_train_button" onclick="start_train()" class="btn btn-warning">Start Train</a>
+            <a href="#" style="width: 200px;" id="start_train_button" onclick="start_train()"
+                class="btn btn-warning">Start Train</a>
         </div>
     </div>
     <script>
+        $("#tracking_training").hide();
         $("#training_link").addClass("active");
-        function start_train(){
+        var status_interval = null;
+        var done_training = false;
+
+        function terminate_training(){
+            model_name = $("#model_name").val();
+            $.ajax({
+                type: 'POST',
+                url: "/terminate_training",
+                data: {
+                    model_name: model_name,
+                },
+                success: function (resultData) {
+                    clearInterval(status_interval);
+                    alert("Terminating...");
+                }
+            });
+        }
+
+        var image_index = 0
+        function get_training_status() {
+            model_name = $("#model_name").val();
+            $.ajax({
+                type: 'POST',
+                url: "/get_training_status",
+                data: {
+                    model_name: model_name,
+                },
+                success: function (resultData) {
+                    $("#current_epoch_text").text(resultData['current_epoch']);
+                    $("#result_images").empty();
+                    for (let i = 0; i < resultData['image_path'].length; i++) {
+                        $("#result_images").append("<img id='img"+image_index+"' class='img-fluid' src='" + resultData['image_path'][i] + "?"+ new Date().getTime()+"'>");
+                        image_index+=1;
+                    };
+                }
+            });
+        }
+
+        function start_train() {
             model_name = $("#model_name").val();
             trainset = $("#trainset").val();
             testset = $("#testset").val();
             number_epochs = $("#number_epochs").val();
+            $("#training_action").hide();
+            $("#tracking_training").show();
+            status_interval = setInterval(get_training_status, 150000);
 
             $.ajax({
                 type: 'POST',
@@ -50,7 +119,8 @@
                     number_epochs: number_epochs
                 },
                 success: function (resultData) {
-                    alert(resultData)
+                    clearInterval(status_interval);
+                    alert(resultData);
                 }
             });
         }

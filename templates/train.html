@@ -108,6 +108,10 @@
                                 start_div = "<div class='row'>"
                                 review_button = '<div style="width:50%"><a style="width:100%" class="btn btn-info" href="/review_model?model_name='+row['model_name']+'"><i class="far fa-edit"></i></a></div>'
                                 delete_button = '<div style="width:50%"><form style="width:100%" action="delete_model" method="POST"><button style="width:100%" name="dl_model" type="submit" class="btn btn-danger dl_model" value="' + row['model_name'] + '""><i class="far fa-trash-alt"></i></button></form></div>';
+                                if (row['model_name']=='base_model'){
+                                    review_button = '<div style="width:50%"><a style="width:100%" class="btn btn-info disabled" href="/review_model?model_name='+row['model_name']+'"><i class="far fa-edit"></i></a></div>'
+                                    delete_button = '<div style="width:50%"><form style="width:100%" action="delete_model" method="POST"><button disabled style="width:100%" name="dl_model" type="submit" class="btn btn-danger dl_model" value="' + row['model_name'] + '""><i class="far fa-trash-alt"></i></button></form></div>';
+                                }
                                 end_div = "</div>"
                                 return start_div+review_button+delete_button+end_div;
                             }

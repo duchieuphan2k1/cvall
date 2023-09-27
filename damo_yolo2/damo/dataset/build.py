@@ -51,7 +51,8 @@ def build_dataset(cfg, ann_files, is_train=True, mosaic_mixup=None):
 
 def make_data_sampler(dataset, shuffle):
 
-    return DistributedSampler(dataset, shuffle=shuffle)
+    # return DistributedSampler(dataset, shuffle=shuffle)
+    return torch.utils.data.RandomSampler(dataset)
 
 
 def _quantize(x, bins):
