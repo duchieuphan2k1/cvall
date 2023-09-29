@@ -13,6 +13,20 @@ class FastFAM_Infer:
         self.path_handler = PathHandler()
         self.DEVICE = 'cpu'
 
+    def run_image(self, image, bboxes: list, plot=False, output_path=None):
+        everything_results = self.model(image, device=self.DEVICE, retina_masks=True, imgsz=1024, conf=0.4, iou=0.9,)
+        prompt_process = FastSAMPrompt(image, everything_results, device=self.DEVICE)
+        # everything prompt
+        ann = prompt_process.everything_prompt()
+        # bbox default shape [0,0,0,0] -> [x1,y1,x2,y2]
+        ann = prompt_process.box_prompt(bboxes=bboxes)#.astype(np.uint8)
+
+        if plot and output_path:
+            prompt_process.plot(annotations=ann,output_path=output_path, mask_random_color=False)
+            return output_path       
+
+        return ann 
+
     def run_image_path(self, image_path, bboxes: list):
         everything_results = self.model(image_path, device=self.DEVICE, retina_masks=True, imgsz=1024, conf=0.4, iou=0.9,)
         prompt_process = FastSAMPrompt(image_path, everything_results, device=self.DEVICE)

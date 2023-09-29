@@ -21,6 +21,17 @@
                 {% endif %}
                 {% endif %}
                 <hr>
+                <div class="d-flex align-items-center justify-content-center">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="segment_checkbox" value="1">
+                        <label class="form-check-label" for="segment_checkbox">Segment Objects</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="tracking_checkbox" value="1">
+                        <label class="form-check-label" for="tracking_checkbox">Tracking Objects</label>
+                    </div>
+                </div>
+                <br>
                 <div class="row" style="margin-left: 10%; margin-right: 10%;">
                     <div class="form-check" style="width: 45%; margin-right: 5%">
                         <input class="form-check-input" type="radio" name="flexRadioDefault" id="upload_choice" checked>
@@ -35,6 +46,7 @@
                         </label>
                     </div>
                 </div>
+
 
                 <img src="" alt="">
                 <form action="/upload_file" method="post" enctype="multipart/form-data">
@@ -55,7 +67,8 @@
             <div id="predicted_output" style="width: 50%; ">
                 <hr>
                 <div id="predicted_action" style="display: none;">
-                    <a type="button" id="download_output" class="btn btn-primary" style="width: 200px;">Download Output</a>
+                    <a type="button" id="download_output" class="btn btn-primary" style="width: 200px;">Download
+                        Output</a>
                     <button class="btn btn-warning" style="width: 200px;">Get Model API</button>
                     <button class="btn btn-info" style="width: 200px;">Export Model Module</button>
                 </div>
@@ -69,24 +82,36 @@
             var input_type = $('#input_type').val();
             var input_name = $('#input_name').val();
             var model_name = $('#model_name').val();
+            var segment = 0
+            var tracking = 0
+            if ($("#segment_checkbox").prop('checked') == true){
+                segment = 1
+            }
+
+            if ($("#tracking_checkbox").prop('checked') == true){
+                tracking = 1
+            }
+
             $.ajax({
                 type: 'POST',
                 url: "{{url_for('infer_detection')}}",
                 data: {
                     input_type: input_type,
                     input_name: input_name,
-                    model_name: model_name
+                    model_name: model_name,
+                    segment: segment,
+                    tracking: tracking
                 },
                 success: function (resultData) {
                     console.log(resultData);
                     $("#out_input").remove();
-                    if (input_type=="video"){
-                        $("#predicted_output").prepend('<video id="out_input" style="width: 100%" controls="controls"><source src="static/predicted/out_'+input_name+'" type="video/mp4" /></video>')
-                    }else{
-                        $("#predicted_output").prepend('<img id="out_input" style="width: 100%" src="static/predicted/'+input_name+'" alt="">')
+                    if (input_type == "video") {
+                        $("#predicted_output").prepend('<video id="out_input" style="width: 100%" controls="controls"><source src="static/predicted/out_' + input_name + '" type="video/mp4" /></video>')
+                    } else {
+                        $("#predicted_output").prepend('<img id="out_input" style="width: 100%" src="static/predicted/' + input_name + '" alt="">')
                     }
                     $("#predicted_action").css('display', 'block');
-                    $("#download_output").attr('href', '/download_file?file_name='+input_name)
+                    $("#download_output").attr('href', '/download_file?file_name=' + input_name)
                 }
             });
         }

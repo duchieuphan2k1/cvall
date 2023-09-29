@@ -530,6 +530,9 @@ def infer_detection():
     input_type = request.form.get("input_type")
     input_name = request.form.get("input_name")
     model_name = request.form.get("model_name")
+    segment = int(request.form.get("segment"))
+    tracking = int(request.form.get("tracking"))
+
     started_ckpt = path_handler.get_ckpt_path_by_name(model_name)
     started_config = path_handler.get_config_path_by_name(model_name)
     infer_runner = InferRunner(started_config, started_ckpt, path_handler.get_output_demo_path())
@@ -538,9 +541,9 @@ def infer_detection():
     input_path = os.path.join(demo_input_dir, input_name)
 
     if input_type == "image":
-        inf_time = infer_runner.run_image(input_path)
+        inf_time = infer_runner.run_image(input_path, segment=segment, tracking=tracking)
     elif input_type == "video":
-        inf_time = infer_runner.run_video(input_path)
+        inf_time = infer_runner.run_video(input_path, segment=segment, tracking=tracking)
     
     return str(round(inf_time, 4))
 

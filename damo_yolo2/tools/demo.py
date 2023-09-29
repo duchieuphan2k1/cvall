@@ -18,7 +18,7 @@ from damo.utils import get_model_info, vis, postprocess
 from damo.utils.demo_utils import transform_img
 from damo.structures.image_list import ImageList
 from damo.structures.bounding_box import BoxList
-
+from FastSAM2.fastsam_inference import FastFAM_Infer
 IMAGES=['png', 'jpg']
 VIDEOS=['mp4', 'avi']
 
@@ -51,6 +51,7 @@ class Infer():
             self.class_names = tuple(self.class_names)
 
         self.infer_size = infer_size
+        self.fastsam_infer = FastFAM_Infer()
         config.dataset.size_divisibility = 0
         self.config = config
         self.model = self._build_engine(self.config, self.engine_type)
@@ -251,10 +252,15 @@ class Infer():
 
         return bboxes, scores, cls_inds
 
-    def visualize(self, image, bboxes, scores, cls_inds, conf, save_name='vis.jpg', save_result=True):
-        vis_img = vis(image, bboxes, scores, cls_inds, conf, self.class_names)
+    def visualize(self, image, bboxes, scores, cls_inds, conf, save_name='vis.jpg', save_result=True, segment=0, tracking=0):
+        save_path = os.path.join(self.output_dir, save_name)
+        if segment and len(bboxes)>0:
+            save_path = self.fastsam_infer.run_image(image, bboxes=bboxes.tolist(), plot=True, output_path=save_path)
+            image = cv2.imread(save_path)
+
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        vis_img = vis(image, bboxes, scores, cls_inds, conf, self.class_names, tracking=tracking)
         if save_result:
-            save_path = os.path.join(self.output_dir, save_name)
             print(f"save visualization results at {save_path}")
             cv2.imwrite(save_path, vis_img[:, :, ::-1])
         return vis_img
@@ -275,15 +281,15 @@ class InferRunner():
         bboxes, scores, cls_inds = self.infer_engine.forward(origin_img)
         return bboxes, scores, cls_inds
 
-    def run_image(self, image_path):
+    def run_image(self, image_path, segment=0, tracking=0):
         origin_img = np.asarray(Image.open(image_path).convert('RGB'))
         start = time.time()
         bboxes, scores, cls_inds = self.infer_engine.forward(origin_img)
         inf_time = time.time() - start
-        vis_res = self.infer_engine.visualize(origin_img, bboxes, scores, cls_inds, conf=self.conf, save_name=os.path.basename(image_path), save_result=True)
+        vis_res = self.infer_engine.visualize(origin_img, bboxes, scores, cls_inds, conf=self.conf, save_name=os.path.basename(image_path), save_result=True, segment=segment, tracking=tracking)
         return inf_time
 
-    def run_video(self, video_path):
+    def run_video(self, video_path, segment=0, tracking=0):
         cap = cv2.VideoCapture(video_path)
         width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
         height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
@@ -302,7 +308,7 @@ class InferRunner():
             ret_val, frame = cap.read()
             if ret_val:
                 bboxes, scores, cls_inds = self.infer_engine.forward(frame)
-                result_frame = self.infer_engine.visualize(frame, bboxes, scores, cls_inds, conf=self.conf, save_result=False)
+                result_frame = self.infer_engine.visualize(frame, bboxes, scores, cls_inds, conf=self.conf, save_result=False, segment=segment, tracking=tracking)
                 vid_writer.write(result_frame)
         inf_time = time.time() - start
         vid_writer.release()

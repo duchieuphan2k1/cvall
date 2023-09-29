@@ -8,16 +8,16 @@ class DatasetCatalog(object):
     DATA_DIR = 'datasets'
     DATASETS = {
         'coco_2017_train': {
-            'img_dir': 'augmented_train01/images',
-            'ann_file': 'augmented_train01/coco_annotations/annotation.json'
+            'img_dir': 'volleyball_action_train/images',
+            'ann_file': 'volleyball_action_train/coco_annotations/annotation.json'
         },
         'coco_2017_val': {
-            'img_dir': 'augmented_test01/images',
-            'ann_file': 'augmented_test01/coco_annotations/annotation.json'
+            'img_dir': 'volleyball_action_test/images',
+            'ann_file': 'volleyball_action_test/coco_annotations/annotation.json'
         },
         'coco_2017_test_dev': {
-            'img_dir': 'augmented_test01/images',
-            'ann_file': 'augmented_test01/coco_annotations/annotation.json'
+            'img_dir': 'volleyball_action_test/images',
+            'ann_file': 'volleyball_action_test/coco_annotations/annotation.json'
         },
         }
 
