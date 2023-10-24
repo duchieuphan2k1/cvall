@@ -1,4 +1,5 @@
-# cvall
+![alt text](static/CVall_logo.png)
+
 ## 1. Installation
 - Python Version: 3.8
 
