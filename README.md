@@ -16,7 +16,9 @@
 ```pip install -r requirements.txt```
 
 ### For Ubuntu, run these command on terminal:
-```export PYTHONPATH=$PYTHONPATH:damo_yolo2:FastSAM2:.```
+
+```export PYTHONPATH=$PYTHONPATH:damo_yolo2:FastSAM2:.``` 
+
 ```pip install -r requirements.txt```
 
 ## 2. Run App
