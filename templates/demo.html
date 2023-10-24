@@ -8,6 +8,11 @@
         <div class="card-body row">
 
             <div id="choose_img" style="width: 50%; ">
+
+                <video style="width: 100%" controls="controls" muted controls autoplay>
+                    <source src="{{url_for('static', filename='demo_stuff/' + 'demo_detection.mp4')}}" type="video/mp4"/>
+                </video>
+
                 {% if input_type is not none %}
                 <input id="input_type" type="text" style="display: none;" value="{{input_type}}">
                 <input id="input_name" type="text" style="display: none;" value="{{input_name}}">
@@ -32,28 +37,6 @@
                     </div>
                 </div>
                 <br>
-                <div class="row" style="margin-left: 10%; margin-right: 10%;">
-                    <div class="form-check" style="width: 45%; margin-right: 5%">
-                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="upload_choice" checked>
-                        <label class="form-check-label" for="upload_choice">
-                            Upload file to inference
-                        </label>
-                    </div>
-                    <div class="form-check" style="width: 45%; margin-left: 5%;">
-                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="cam_choice">
-                        <label class="form-check-label" for="cam_choice">
-                            Connect to an IP Camera
-                        </label>
-                    </div>
-                </div>
-
-
-                <img src="" alt="">
-                <form action="/upload_file" method="post" enctype="multipart/form-data">
-                    <label for="file">Upload File (Video [mp4, avi] / Image [jpg, jpeg, png, bmp])</label>
-                    <input class="form-control" type="file" name="file" id="file" onchange="form.submit()">
-                </form>
-                <br>
                 <label for="model_name">Choose your detection model</label>
                 <select id="model_name" class="form-select" aria-label="">
                     {% for model_name in models: %}
@@ -61,8 +44,50 @@
                     {% endfor %}
                 </select>
                 <br>
-                <button id="inference_button" onclick="inference()" style="width: 50%;" class="btn btn-success">Run
-                    Inference</button>
+                <div class="row" style="margin-left: 10%; margin-right: 10%;">
+                    <div class="form-check" style="width: 45%; margin-right: 5%">
+                        <input oninput="set_input()" class="form-check-input" type="radio" name="flexRadioDefault" id="upload_choice" checked>
+                        <label class="form-check-label" for="upload_choice">
+                            Upload file to inference
+                        </label>
+                    </div>
+                    <div class="form-check" style="width: 45%; margin-left: 5%;">
+                        <input oninput="set_input()" class="form-check-input" type="radio" name="flexRadioDefault" id="cam_choice">
+                        <label class="form-check-label" for="cam_choice">
+                            Connect to an IP Camera
+                        </label>
+                    </div>
+                </div>
+                <br>
+
+                <div id="upload_form">
+                    <form action="/upload_file" method="post" enctype="multipart/form-data">
+                        <label for="file">Upload File (Video [mp4, avi] / Image [jpg, jpeg, png, bmp])</label>
+                        <input class="form-control" type="file" name="file" id="file" onchange="form.submit()">
+                    </form>
+                    <br>
+                    <button id="inference_button" onclick="inference()" style="width: 50%;" class="btn btn-success">Run
+                        Inference</button>
+                </div>
+
+                <div id="camera_action">
+                    <div class="mb-3">
+                        <label for="camera_ip" class="form-label">Camera IP</label>
+                        <input type="password" value="127.0.0.52" class="form-control" id="camera_ip" aria-describedby="camera_ip">
+                    </div>
+                    <div class="mb-3">
+                        <label for="camera_username" class="form-label">Camera Username</label>
+                        <input type="password" value="admin" class="form-control" id="camera_username"
+                            aria-describedby="camera_username">
+                    </div>
+                    <div class="mb-3">
+                        <label for="camera_password" class="form-label">Camera Password</label>
+                        <input type="password" value="123456" class="form-control" id="camera_password">
+                    </div>
+                    
+                    <button id="camera_button" onclick="connect_camera()" style="width: 50%;" class="btn btn-success">Connect and Inference</button>
+                </div>
+                <br>
             </div>
             <div id="predicted_output" style="width: 50%; ">
                 <hr>
@@ -78,17 +103,29 @@
     </div>
     <script>
         $("#demo_link").addClass("active");
+        set_input();
+        function set_input(){
+            if ($("#upload_choice").prop('checked') == true) {
+                $("#camera_action").hide(200);
+                $("#upload_form").show(200);
+            }
+            else {
+                $("#upload_form").hide(200);
+                $("#camera_action").show(200);
+            }
+        }
+
         function inference() {
             var input_type = $('#input_type').val();
             var input_name = $('#input_name').val();
             var model_name = $('#model_name').val();
             var segment = 0
             var tracking = 0
-            if ($("#segment_checkbox").prop('checked') == true){
+            if ($("#segment_checkbox").prop('checked') == true) {
                 segment = 1
             }
 
-            if ($("#tracking_checkbox").prop('checked') == true){
+            if ($("#tracking_checkbox").prop('checked') == true) {
                 tracking = 1
             }
 
