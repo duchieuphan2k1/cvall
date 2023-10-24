@@ -1,0 +1,1 @@
+export PYTHONPATH=$PYTHONPATH:damo_yolo2:FastSAM2:.

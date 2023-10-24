@@ -33,6 +33,8 @@ dataset_augment = DatasetAugment()
 
 @app.route("/")
 def home():
+    if not os.path.exists(general_cfg.path.datasets_dir):
+        os.mkdir(general_cfg.path.datasets_dir)
     return render_template("home.html")
 
 @app.route("/data")
