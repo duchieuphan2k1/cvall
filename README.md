@@ -5,6 +5,8 @@
 
 - Cuda Version: 12.0
 
+Download ```base_model.zip``` via [Google Drive](https://drive.google.com/file/d/16e59TO1yJAW1vrr9gFwl1gjzNB4WUod_/view?usp=sharing). Then unzip it and put into ./models folder
+
 ### For Windows, run these command on command line:
 
 ```set PYTHONPATH=%PYTHONPATH%;damo_yolo2```
