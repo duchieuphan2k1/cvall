@@ -35,6 +35,13 @@ dataset_augment = DatasetAugment()
 def home():
     if not os.path.exists(general_cfg.path.datasets_dir):
         os.mkdir(general_cfg.path.datasets_dir)
+    
+    if not os.path.exists(general_cfg.path.models_dir):
+        os.mkdir(general_cfg.path.models_dir)
+
+    if not os.path.exists(general_cfg.path.background_dir):
+        os.mkdir(general_cfg.path.background_dir)
+
     return render_template("home.html")
 
 @app.route("/data")
@@ -106,6 +113,18 @@ def start_train():
     dataset_handle = DatasetHandler()
     dataset_handle.labelme_to_coco(testset)
     dataset_handle.labelme_to_coco(trainset)
+
+    using_params = {
+        'train': {
+            "img_dir": path_handler.get_image_path_by_name(trainset),
+            "ann_file": path_handler.get_coco_annotation_file(trainset)
+        },
+        'test': {
+            "img_dir": path_handler.get_image_path_by_name(testset),
+            "ann_file": path_handler.get_coco_annotation_file(testset)
+        }
+    }
+    ConfigHandler().dump_config_by_path(general_cfg.path.using_params_name, using_params)
     os.system("python wrap_training.py --model_name {}".format(model_name))
     return "Done Training"
 

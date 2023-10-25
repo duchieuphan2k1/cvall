@@ -266,7 +266,7 @@ class Infer():
         return vis_img
 
 class InferRunner():
-    def __init__(self, config_file, engine, output_dir='./', infer_size=[1024, 1024], conf=0.6, device="cpu"):
+    def __init__(self, config_file, engine, output_dir='./', infer_size=[1024, 1024], conf=0.6, device="cuda"):
         self.config_file = config_file
         self.infer_size = infer_size
         self.conf = conf

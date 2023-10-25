@@ -11,6 +11,7 @@ path:
   model_ckpt_name: ckpt
   model_configs_name: configs
   model_yaml_name: params.yaml
+  using_params_name: using_params.yml
 
   evaluation_dir: experiments
   pred_labelme_dir: pred_labelme

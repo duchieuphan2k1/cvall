@@ -6,9 +6,13 @@ class ConfigHandler:
     def __init__(self):
         self.general_config = yaml.safe_load(open("all_configs/general_config.yaml", 'r'))
         self.default_data_augment = yaml.safe_load(open("all_configs/default_data_augment.yaml", 'r'))
+        self.using_params = yaml.safe_load(open(self.general_config['path']['using_params_name'], 'r'))
 
     def get_general_config(self):
         return edict(self.general_config)
+
+    def get_using_params(self):
+        return edict(self.using_params)
     
     def load_default_augment(self, dict=False):
         if dict:

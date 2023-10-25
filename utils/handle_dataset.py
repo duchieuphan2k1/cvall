@@ -59,7 +59,7 @@ class DatasetHandler:
             img_area = segment_info['imageHeight']*segment_info['imageWidth']
             for obj in segment_info['shapes']:
                 class_nbr_info[obj['label']]+=1
-                obj_area = cv2.contourArea(np.array([obj['points']]))
+                obj_area = cv2.contourArea(np.array([obj['points']]).astype(int))
                 object_image_ratio.append(round(np.sqrt(obj_area/img_area), 3))
         
         keys = list(class_nbr_info.keys())
