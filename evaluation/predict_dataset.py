@@ -208,6 +208,10 @@ class PredictDataset():
     def get_accuracy(self, all_results:dict):
         precision_list = []
         for class_name in all_results.keys():
+            if all_results[class_name]['num_gt'] == 0:
+                precision_list.append(1)
+                continue
+
             class_precision = all_results[class_name]['num_true']/all_results[class_name]['num_gt']
             precision_list.append(class_precision)
         return round(np.average(precision_list), 4)
@@ -256,7 +260,10 @@ class PredictDataset():
                     "true: {}".format(num_true)]
             errs = np.array([num_wrong_pred, num_excessive, num_missing, num_true])
 
-            cls_acc = round((all_results[class_name]['num_true'])/(all_results[class_name]['num_gt']), 4)
+            if all_results[class_name]['num_gt'] == 0:
+                cls_acc = 1
+            else:
+                cls_acc = round((all_results[class_name]['num_true'])/(all_results[class_name]['num_gt']), 4)
 
             if num_wrong_pred!=0 or num_excessive!=0 or num_missing!=0:
                 plt.title("Acurracy and Error Analysis of class {}".format(class_name))

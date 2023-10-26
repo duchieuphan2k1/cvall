@@ -4,7 +4,6 @@ from utils.handle_path import PathHandler
 from utils.handle_dataset import DatasetHandler
 from utils.handle_model import ModelHandler
 from utils.handle_status import StatusHandler
-from evaluation.predict_dataset import PredictDataset
 from data_augment.augment_dataset import DatasetAugment
 from damo_yolo2.tools.demo import InferRunner
 from FastSAM2.fastsam_inference import FastFAM_Infer
@@ -536,6 +535,7 @@ def start_evaluate():
     model_name = request.form.get('model_name')
     predict_dataset = PredictDataset(dataset_name, model_name)
     predict_dataset.run_pred()
+    dataset_handler.labelme_to_coco(dataset_name)
     predict_dataset.eval_results(plot=True)
     return "Done Evaluation"
 
