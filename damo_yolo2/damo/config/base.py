@@ -22,7 +22,7 @@ miscs = easydict({
     'seed': 1234,                  # rand seed for initialize
     'eval_interval_epochs': 1,    # evaluation interval
     'ckpt_interval_epochs': 1,    # ckpt saving interval
-    'num_workers': 4,
+    'num_workers': 16,
 })
 
 train = easydict({
@@ -51,7 +51,7 @@ train = easydict({
 
 test = easydict({
     'augment': test_aug,           # augmentation config for testing
-    'batch_size': 128,             # testing batch size
+    'batch_size': 1,             # testing batch size
 })
 
 dataset = easydict({

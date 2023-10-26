@@ -96,7 +96,7 @@ class Trainer:
         # self.args = args
         self.output_dir = cfg.miscs.output_dir
         self.exp_name = cfg.miscs.exp_name
-        self.device = 'cpu'
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         self.testset = cfg.dataset.testset
         self.model_name = cfg.model_name
