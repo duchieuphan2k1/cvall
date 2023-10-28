@@ -52,16 +52,26 @@ class DatasetHandler:
         for class_name in class_list:
             class_nbr_info[class_name] = 0
         
-        segment_dir = self.path_handler.get_labelme_segmentation_path(dataset_name)
-        for segment_file in os.listdir(segment_dir):
-            segment_path = os.path.join(segment_dir, segment_file)
-            segment_info = json.load(open(segment_path, 'r'))
+        # segment_dir = self.path_handler.get_labelme_segmentation_path(dataset_name)
+        # for segment_file in os.listdir(segment_dir):
+        #     segment_path = os.path.join(segment_dir, segment_file)
+        #     segment_info = json.load(open(segment_path, 'r'))
+        #     img_area = segment_info['imageHeight']*segment_info['imageWidth']
+        #     for obj in segment_info['shapes']:
+        #         class_nbr_info[obj['label']]+=1
+        #         obj_area = cv2.contourArea(np.array([obj['points']]).astype(int))
+        #         object_image_ratio.append(round(np.sqrt(obj_area/img_area), 3))
+
+        annot_dir = self.path_handler.get_labelme_annotation_path(dataset_name)
+        for annot_file in os.listdir(annot_dir):
+            annot_path = os.path.join(annot_dir, annot_file)
+            segment_info = json.load(open(annot_path, 'r'))
             img_area = segment_info['imageHeight']*segment_info['imageWidth']
             for obj in segment_info['shapes']:
                 class_nbr_info[obj['label']]+=1
-                obj_area = cv2.contourArea(np.array([obj['points']]).astype(int))
+                obj_area = (obj['points'][1][0] - obj['points'][0][0])*(obj['points'][1][1] - obj['points'][0][1])
                 object_image_ratio.append(round(np.sqrt(obj_area/img_area), 3))
-        
+
         keys = list(class_nbr_info.keys())
         values = list(class_nbr_info.values())
         fig = plt.figure()

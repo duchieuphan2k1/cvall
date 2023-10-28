@@ -80,7 +80,7 @@
                         <input type="password" value="123456" class="form-control" id="camera_password">
                     </div>
                     
-                    <button id="camera_button" onclick="connect_camera()" style="width: 50%;" class="btn btn-success">Connect and Inference</button>
+                    <button id="camera_button" disabled onclick="connect_camera()" style="width: 50%;" class="btn btn-success">Connect and Inference</button>
                 </div>
                 <br>
             </div>
@@ -98,7 +98,8 @@
     </div>
     <script>
         $("#demo_link").addClass("active");
-        set_input();
+        $("#camera_action").hide();
+        $("#upload_form").show();
         function set_input(){
             if ($("#upload_choice").prop('checked') == true) {
                 $("#camera_action").hide(200);

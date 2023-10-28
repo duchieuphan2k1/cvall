@@ -4,3 +4,4 @@ datasets/*
 backgrounds/*
 experiments/*
 *.pth
+backups
