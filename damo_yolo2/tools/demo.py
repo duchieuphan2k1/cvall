@@ -80,6 +80,7 @@ class Infer():
                 model.load_state_dict(ckpt['model'], strict=True)
             except:
                 model.load_state_dict(ckpt, strict=True)
+                # model = ckpt
 
             for layer in model.modules():
                 if isinstance(layer, RepConv):
@@ -258,8 +259,10 @@ class Infer():
             save_path = self.fastsam_infer.run_image(image, bboxes=bboxes.tolist(), plot=True, output_path=save_path)
             image = cv2.imread(save_path)
 
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         vis_img = vis(image, bboxes, scores, cls_inds, conf, self.class_names, tracking=tracking)
+        if segment:
+            vis_img = cv2.cvtColor(vis_img, cv2.COLOR_BGR2RGB)
         if save_result:
             print(f"save visualization results at {save_path}")
             cv2.imwrite(save_path, vis_img[:, :, ::-1])
@@ -272,6 +275,7 @@ class InferRunner():
         self.conf = conf
         self.engine = engine
         self.device = device
+        print("***************", self.config_file)
         config = parse_config(self.config_file)
         self.output_dir = output_dir
         self.infer_engine = Infer(config, infer_size=self.infer_size, device=self.device,

@@ -107,7 +107,7 @@
             number_epochs = $("#number_epochs").val();
             $("#training_action").hide();
             $("#tracking_training").show();
-            status_interval = setInterval(get_training_status, 150000);
+            status_interval = setInterval(get_training_status, 5000);
 
             $.ajax({
                 type: 'POST',

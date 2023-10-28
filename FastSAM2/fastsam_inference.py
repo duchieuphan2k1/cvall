@@ -11,7 +11,7 @@ class FastFAM_Infer:
     def __init__(self):
         self.model = FastSAM('FastSAM2/weights/FastSAM-x.pt')
         self.path_handler = PathHandler()
-        self.DEVICE = 'cpu'
+        self.DEVICE = 'cuda'
 
     def run_image(self, image, bboxes: list, plot=False, output_path=None):
         everything_results = self.model(image, device=self.DEVICE, retina_masks=True, imgsz=1024, conf=0.4, iou=0.9,)

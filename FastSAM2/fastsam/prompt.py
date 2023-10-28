@@ -138,7 +138,7 @@ class FastSAMPrompt:
             )
         else:
             if isinstance(annotations[0], np.ndarray):
-                annotations = torch.from_numpy(annotations)
+                annotations = torch.Tensor(annotations)
             self.fast_show_mask_gpu(
                 annotations,
                 plt.gca(),

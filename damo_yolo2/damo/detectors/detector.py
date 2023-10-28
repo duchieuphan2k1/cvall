@@ -38,7 +38,7 @@ class Detector(nn.Module):
 
     def load_pretrain_detector(self, pretrain_model):
 
-        state_dict = torch.load(pretrain_model, map_location='cpu')['model']
+        state_dict = torch.load(pretrain_model, map_location='cuda')
         logger.info(f'Finetune from {pretrain_model}................')
         new_state_dict = {}
         for k, v in self.state_dict().items():

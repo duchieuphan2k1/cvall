@@ -8,11 +8,11 @@ color:
 
 resize:
   small_scale: [5, 7]
-  medium_scale: [7, 25]
+  medium_scale: [7, 15]
   big_scale: [25, 50]
 
-  small_percent: 40
-  medium_percent: 50
+  small_percent: 70
+  medium_percent: 30
 
 geometry:
   PerspectiveTransform: [0.01, 0.15]

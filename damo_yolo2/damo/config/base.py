@@ -22,7 +22,7 @@ miscs = easydict({
     'seed': 1234,                  # rand seed for initialize
     'eval_interval_epochs': 1,    # evaluation interval
     'ckpt_interval_epochs': 1,    # ckpt saving interval
-    'num_workers': 16,
+    'num_workers': 12,
 })
 
 train = easydict({
@@ -37,7 +37,7 @@ train = easydict({
     'warmup_epochs': 5,            # warmup epochs
     'no_aug_epochs': 16,           # training epochs after closing augmentation
     'resume_path': None,           # ckpt path for resuming training
-    'finetune_path': None,         # ckpt path for finetuning
+    'finetune_path': 'model.pth',         # ckpt path for finetuning
     'augment': train_aug,          # augmentation config for training
     # optimizer
     'optimizer': {
@@ -116,10 +116,14 @@ class Config(metaclass=ABCMeta):
 
 def get_config_by_file(config_file):
     try:
+        print("]]]]]]]]]]]]]]]", config_file)
         sys.path.append(os.path.dirname(config_file))
-        current_config = importlib.import_module(
-            os.path.basename(config_file).split('.')[0])
-        exp = current_config.Config()
+        model_name = os.path.basename(os.path.dirname(os.path.dirname(config_file)))
+        config_file_name = os.path.basename(config_file).split('.')[0]
+        exec('from models.{}.configs.{} import Config'.format(model_name, config_file_name),  globals())
+        current_config = Config()
+        print("000000000000000", current_config)
+        exp = current_config
     except Exception:
         raise ImportError(
             "{} doesn't contains class named 'Config'".format(config_file))

@@ -8,11 +8,6 @@
         <div class="card-body row">
 
             <div id="choose_img" style="width: 50%; ">
-
-                <video style="width: 100%" controls="controls" muted controls autoplay>
-                    <source src="{{url_for('static', filename='demo_stuff/' + 'demo_detection.mp4')}}" type="video/mp4"/>
-                </video>
-
                 {% if input_type is not none %}
                 <input id="input_type" type="text" style="display: none;" value="{{input_type}}">
                 <input id="input_name" type="text" style="display: none;" value="{{input_name}}">
@@ -143,9 +138,9 @@
                     console.log(resultData);
                     $("#out_input").remove();
                     if (input_type == "video") {
-                        $("#predicted_output").prepend('<video id="out_input" style="width: 100%" controls="controls"><source src="static/predicted/out_' + input_name + '" type="video/mp4" /></video>')
+                        $("#predicted_output").prepend('<video id="out_input" style="width: 100%" controls="controls"><source src="static/predicted/out_' + input_name + "?"+ new Date().getTime()+ '" type="video/mp4" /></video>')
                     } else {
-                        $("#predicted_output").prepend('<img id="out_input" style="width: 100%" src="static/predicted/' + input_name + '" alt="">')
+                        $("#predicted_output").prepend('<img id="out_input" style="width: 100%" src="static/predicted/' + input_name + "?"+ new Date().getTime()+ '" alt="">')
                     }
                     $("#predicted_action").css('display', 'block');
                     $("#download_output").attr('href', '/download_file?file_name=' + input_name)

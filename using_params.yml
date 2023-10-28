@@ -1,6 +1,6 @@
 test:
-  ann_file: datasets/augmented_test-001/coco_annotations/annotation.json
-  img_dir: datasets/augmented_test-001/images
+  ann_file: datasets/Aquatrash/coco_annotations/annotation.json
+  img_dir: datasets/Aquatrash/images
 train:
-  ann_file: datasets/augmented_train-001/coco_annotations/annotation.json
-  img_dir: datasets/augmented_train-001/images
+  ann_file: datasets/all_datasets/coco_annotations/annotation.json
+  img_dir: datasets/all_datasets/images
