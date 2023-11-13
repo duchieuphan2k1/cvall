@@ -1,5 +1,7 @@
 ![alt text](static/CVall_logo.png)
 
+CVall is a web-based system, that allows to development of object detection models, segmentation problems, object tracking,... projects with no line of code. Following a standard machine learning life cycle, CVall supports all processes of AI development: data preparation, data analysis, model development, model evaluation, and deployment
+
 ## 1. Installation
 - Python Version: 3.8
 

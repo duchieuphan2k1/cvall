@@ -15,6 +15,7 @@ path:
 
   evaluation_dir: experiments
   pred_labelme_dir: pred_labelme
+  pred_vis_dir: visualization
   all_results_file_name: all_results.json
   precision_plot_dir: precision_plot
   model_status_file_name: status.json

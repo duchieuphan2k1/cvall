@@ -7,6 +7,8 @@ import shutil
 import json
 import numpy as np
 from PIL import Image
+import torch
+import cv2
 import matplotlib.pyplot as plt
 
 class PredictDataset():
@@ -26,11 +28,13 @@ class PredictDataset():
         self.image_folder = self.path_handler.get_image_path_by_name(dataset_name)
         self.result_file_path = self.path_handler.get_result_file_path(self.model_name, dataset_name)
         self.precision_plot_dir = self.path_handler.get_precision_plot_dir(self.model_name, dataset_name)
-
+        self.generate_annotation = generate_annotation
         if generate_annotation:
             self.labelme_output_folder = self.path_handler.get_labelme_annotation_path(dataset_name)
         else:
             self.labelme_output_folder = self.path_handler.get_pred_labelme_dir(model_name, dataset_name)
+            self.vis_output_folder = self.path_handler.get_pred_vis_dir(model_name, dataset_name)
+
             self.labelme_annot_folder = self.path_handler.get_labelme_annotation_path(dataset_name)
         
         self.labelme_template =  {
@@ -115,11 +119,13 @@ class PredictDataset():
             labelme_img['imageWidth'] = w
             
             bboxes, scores, cls_inds = self.infer_runner.predict(origin_img)
+            bboxes= bboxes.to(torch.int)
             shapes = []
             for i in range(len(bboxes)):
                 bbox = bboxes[i].tolist()
                 scr = scores[i].tolist()
                 class_name = self.infer_runner.infer_engine.class_names[int(cls_inds[i].item())]
+                
 
                 # if len(classes) != 0:
                 #     if class_name not in classes:
@@ -133,9 +139,12 @@ class PredictDataset():
                     'shape_type': 'rectangle',
                     'flags': {}
                 }
+                # cv2.putText(origin_img,"{}: {}".format(class_name, scr),(bbox[0],bbox[1]+10),0,0.3,(0,255,0))
+                # cv2.rectangle(origin_img,(bbox[0],bbox[1]),(bbox[2], bbox[3]),(0,255,0),2)
                 shapes.append(box_annot)
             labelme_img['shapes'] = shapes
-
+            # if not self.generate_annotation:
+            #     cv2.imwrite(os.path.join(self.vis_output_folder, image_name), origin_img)
             json_filename = image_name.replace('.jpg', '.json')
             with open(os.path.join(self.labelme_output_folder, json_filename), 'w') as f:
                 f.write(json.dumps(labelme_img))

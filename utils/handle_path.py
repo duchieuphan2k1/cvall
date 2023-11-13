@@ -143,7 +143,14 @@ class PathHandler:
         if not os.path.exists(path):
             os.mkdir(path)
         return path
-    
+
+    def get_pred_vis_dir(self, model_name, dataset_name):
+        dataset_eval_dir = self.get_evaluation_folder(model_name, dataset_name)
+        path = os.path.join(dataset_eval_dir, self.general_config.path.pred_vis_dir)
+        if not os.path.exists(path):
+            os.mkdir(path)
+        return path
+
     def get_result_file_path(self, model_name, dataset_name):
         dataset_eval_dir = self.get_evaluation_folder(model_name, dataset_name)
         path = os.path.join(dataset_eval_dir, self.general_config.path.all_results_file_name)

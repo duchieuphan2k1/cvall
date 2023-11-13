@@ -401,6 +401,7 @@ class Trainer:
                 self.status_handler.update_process(self.epoch, current_accuracy, loss.item())
                 if current_accuracy > best_accuracy:
                     self.save_ckpt_cpu(os.path.join(self.ckpt_dir, 'model.pth'), local_rank=local_rank)
+                    best_accuracy=current_accuracy
             synchronize()
             status_info = self.status_handler.get_info()
             if status_info['terminating']:

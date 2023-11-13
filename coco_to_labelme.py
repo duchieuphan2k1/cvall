@@ -2,8 +2,8 @@ import json
 import pandas as pd
 from tqdm import tqdm
 
-data_path = "datasets/trashnet"
-coco_annot = "datasets/trashnet/coco_annotations/annotation.json"
+data_path = "Dataset4/all_dataset4"
+coco_annot = "Dataset4/all_dataset4/annotations/label.json"
 
 annot = json.load(open(coco_annot, 'r'))
 image_df = pd.DataFrame(annot['images'])
