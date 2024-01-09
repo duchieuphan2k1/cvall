@@ -117,7 +117,7 @@ class PredictDataset():
             labelme_img['imagePath'] = "../{}/{}".format(self.path_handler.general_config.path.image_dir_name, image_name)
             labelme_img['imageHeight'] = h
             labelme_img['imageWidth'] = w
-            
+    
             bboxes, scores, cls_inds = self.infer_runner.predict(origin_img)
             bboxes= bboxes.to(torch.int)
             shapes = []
@@ -126,7 +126,6 @@ class PredictDataset():
                 scr = scores[i].tolist()
                 class_name = self.infer_runner.infer_engine.class_names[int(cls_inds[i].item())]
                 
-
                 # if len(classes) != 0:
                 #     if class_name not in classes:
                 #         continue
@@ -139,12 +138,12 @@ class PredictDataset():
                     'shape_type': 'rectangle',
                     'flags': {}
                 }
-                # cv2.putText(origin_img,"{}: {}".format(class_name, scr),(bbox[0],bbox[1]+10),0,0.3,(0,255,0))
-                # cv2.rectangle(origin_img,(bbox[0],bbox[1]),(bbox[2], bbox[3]),(0,255,0),2)
+                cv2.putText(origin_img,"{}: {}".format(class_name, scr),(bbox[0],bbox[1]+10),0,0.3,(0,255,0))
+                cv2.rectangle(origin_img,(bbox[0],bbox[1]),(bbox[2], bbox[3]),(0,255,0),2)
                 shapes.append(box_annot)
             labelme_img['shapes'] = shapes
-            # if not self.generate_annotation:
-            #     cv2.imwrite(os.path.join(self.vis_output_folder, image_name), origin_img)
+            if not self.generate_annotation:
+                cv2.imwrite(os.path.join(self.vis_output_folder, image_name), origin_img)
             json_filename = image_name.replace('.jpg', '.json')
             with open(os.path.join(self.labelme_output_folder, json_filename), 'w') as f:
                 f.write(json.dumps(labelme_img))

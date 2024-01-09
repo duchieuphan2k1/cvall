@@ -1,95 +1,119 @@
 {% include 'header.html' %}
 
-<div class="container">
-    <br>
-    {% include 'data_process.html' %}
-    <br>
-    <div class="text-center">
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#add_dataset"
-            style="width: 200px;">
-            Create New Dataset
-        </button>
-    </div>
+<div style="padding-left: 30px; padding-right: 30px;">
+    <p style="font-size: 18px; margin-top: 30px;">
+        <a style="text-decoration: none; color: #4999D7;" href="/">Home</a>
+        <a style="text-decoration: none; color: #4999D7;" href="/data"> > Data Preparation</a>
+    </p>
 
-    <!-- Modal -->
-    <div class="modal fade" id="add_dataset" tabindex="-1" aria-labelledby="add_datasetLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="/add_new_dataset" method="POST">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="add_datasetLabel">Create New Dataset</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
+    <div class="row flex-nowrap"  style="margin-left: 0">
+        <div class="col-auto px-0">
+            <div id="sidebar" class="collapse collapse-horizontal show">
+                <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100" >
+                    <p style="font-size: 18px; font-weight: bold; padding-right: 150px;">CVall Services</p>
+                    <p style="background-color: #F1EFEF;height: 30px; padding-left: 15px; padding-top: 3px;"><i class="fas fa-database"></i> Datasets</p>                   
 
-                        <div class="mb-3">
-                            <label>Business Secarino</label>
-                            <select class="form-select" id="dataset_secarino" name="dataset_secarino"
-                                aria-label="Business Secarino">
-                                <option value="object_detection">Object Detection</option>
-                                <option value="segmentation">Segmentation</option>
-                                <option value="segmentation">Classification</option>
-                                <option value="tracking">Tracking</option>
-                                <option value="anomaly_detection">Anomaly Detection</option>
-                                <option value="activity_recognition">Activity Recognition</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="dataset_name" class="form-label">Dataset Name</label>
-                            <input name="dataset_name" oninput="check_dataset()" type="text" class="form-control"
-                                id="dataset_name" aria-describedby="DatasetHelp">
-                            <div id="name_warning" class="form-text">Please input an unique name for dataset</div>
-                        </div>
-                        <div class="mb-3">
-                            <label>Dataset Type</label>
-                            <select name="dataset_type" class="form-select" id="dataset_type" aria-label="Dataset Type">
-                                <option value="train">Train</option>
-                                <option value="test">Test</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="dataset_decs" class="form-label">Dataset Description</label>
-                            <textarea name="dataset_decs" type="text" class="form-control" id="dataset_decs"></textarea>
-                        </div>
-                        <div name="dataset_classes" id="dataset_classes" class="mb-3">
-                            <label for="dataset_classes">Classes</label>
-                            <input onclick="add_train_class()" class="btn btn-primary" type="button"
-                                style="width: 100%;" value="Add New Class">
-                        </div>
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" id="create_button" type="button" class="btn btn-primary"
-                            disabled>Create</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
+        <div class="col-auto" id="collapse_menu_button" style="padding-top: 3px; font-size: 14px; color: #4999D7;">
+            <p data-bs-target="#sidebar" data-bs-toggle="collapse"
+            class="text-decoration-none" type="button">
+            <i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i>
+        </p>
+        </div>
+        <main class="col ps-md-2 pt-2">
+
+            <div class="text-center">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#add_dataset"
+                    style="width: 200px;">
+                    Create New Dataset
+                </button>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="add_dataset" tabindex="-1" aria-labelledby="add_datasetLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="/add_new_dataset" method="POST">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="add_datasetLabel">Create New Dataset</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+
+                                <div class="mb-3">
+                                    <label>Business Secarino</label>
+                                    <select class="form-select" id="dataset_secarino" name="dataset_secarino"
+                                        aria-label="Business Secarino">
+                                        <option value="object_detection">Object Detection</option>
+                                        <option value="segmentation">Segmentation</option>
+                                        <option value="segmentation">Classification</option>
+                                        <option value="tracking">Tracking</option>
+                                        <option value="anomaly_detection">Anomaly Detection</option>
+                                        <option value="activity_recognition">Activity Recognition</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="dataset_name" class="form-label">Dataset Name</label>
+                                    <input name="dataset_name" oninput="check_dataset()" type="text"
+                                        class="form-control" id="dataset_name" aria-describedby="DatasetHelp">
+                                    <div id="name_warning" class="form-text">Please input an unique name for dataset
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Dataset Type</label>
+                                    <select name="dataset_type" class="form-select" id="dataset_type"
+                                        aria-label="Dataset Type">
+                                        <option value="train">Train</option>
+                                        <option value="test">Test</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="dataset_decs" class="form-label">Dataset Description</label>
+                                    <textarea name="dataset_decs" type="text" class="form-control"
+                                        id="dataset_decs"></textarea>
+                                </div>
+                                <div name="dataset_classes" id="dataset_classes" class="mb-3">
+                                    <label for="dataset_classes">Classes</label>
+                                    <input onclick="add_train_class()" class="btn btn-primary" type="button"
+                                        style="width: 100%;" value="Add New Class">
+                                </div>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" id="create_button" type="button" class="btn btn-primary"
+                                    disabled>Create</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <table id="dataset_table" class="display" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Dataset Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Preparation Progress</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </main>
     </div>
-    <br>
-    <table id="dataset_table" class="display" style="width: 100%;">
-        <thead>
-            <tr>
-                <th>Dataset Name</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Preparation Progress</th>
-                <th>Created Date</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+
     <script>
         var class_i = 0;
-        $("#data_preparation_link").addClass("active");
-        $("#create_dataset_progress").addClass("active");
-        // $(document).ready(function () {
-        //     $('#dataset_table').DataTable();
-        // });
+
         $(document).ready(function () {
             fetch('/get_all_datasets').then(response => {
                 return response.json();
@@ -101,8 +125,8 @@
                         { "data": "dataset_name", "width": "15%" },
                         { "data": "dataset_type", "width": "10%" },
                         { "data": "dataset_decs", "width": "25%" },
-                        { "data": "preparation_progress", "width": "17%"},
-                        { "data": "created_date", "width": "15%"},
+                        { "data": "preparation_progress", "width": "17%" },
+                        { "data": "created_date", "width": "15%" },
                         { "": null }
                     ],
                     "columnDefs": [
@@ -113,10 +137,10 @@
                             render: function (data, type, row, meta) {
                                 console.log(row['row_id']);
                                 start_div = "<div class='row'>"
-                                review_button = '<div style="width:50%"><a style="width:100%" class="btn btn-info" href="/review_dataset?dataset_name='+row['dataset_name']+'"><i class="far fa-edit"></i></a></div>'
+                                review_button = '<div style="width:50%"><a style="width:100%" class="btn btn-info" href="/review_dataset?dataset_name=' + row['dataset_name'] + '"><i class="far fa-edit"></i></a></div>'
                                 delete_button = '<div style="width:50%"><form style="width:100%" action="delete_dataset" method="POST"><button style="width:100%" name="dl_dataset" type="submit" class="btn btn-danger dl_dataset" value="' + row['dataset_name'] + '""><i class="far fa-trash-alt"></i></button></form></div>';
                                 end_div = "</div>"
-                                return start_div+review_button+delete_button+end_div;
+                                return start_div + review_button + delete_button + end_div;
                             }
                         }
                     ]

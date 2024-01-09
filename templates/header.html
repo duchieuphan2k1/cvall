@@ -11,7 +11,6 @@
     integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-
 </head>
 
 <body>
@@ -22,23 +21,30 @@
 
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
 
-  <div class="container" style="margin-top: 20px;">
-    <div class="text-center">
-      <img style="height: 100px;" src="static/CVall_logo.png" alt="">
-    </div>
+  <div class="row" style="background-color:#006376; height: 40px;">
+    <div class="col" style="margin-left: 10px; font-size: 20px; padding-top: 4px;"><b><a href="/" style="text-decoration: none; color: white">CVall</a></b></div>
+    <div class="col d-flex flex-row-reverse" style="color: white; font-size: 18px;">
+      <i style="margin-left: 10px; margin-right: 10px; padding-top: 11px;" type="button" class="fas fa-bars" data-bs-toggle="dropdown" aria-expanded="false"></i>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><a class="dropdown-item" href="/"><i class="fas fa-home" style="color: #004AAD;"></i> Home</a></li>
+        <li><a class="dropdown-item" href="/data"><i class="fas fa-vector-square" style="color: #6E2EED;"></i> Data Preparation</a></li>
+        <li><a class="dropdown-item" href="/train"><i class="fas fa-robot" style="color: #1D81CE;"></i> Modeling</a></li>
+        <li><a class="dropdown-item" href="/evaluation"><i class="fab fa-searchengin" style="color: #5E17EB;"></i> Evaluation</a></li>
+        <li><a class="dropdown-item" href="/demo"><i class="fas fa-rocket" style="color: #2EB4E7;"></i> Deployment</a></li>
+        <li><a class="dropdown-item" href="#"><i class="fas fa-book" style="color: #004AAD;"></i> Documentation</a></li>
 
-    <header class="d-flex justify-content-center py-3 text-center">
-      <ul class="nav nav-pills" style="width: 100%;">
-        <li class="nav-item" style="width: 20%;"><a id="home_link" href="/" class="nav-link"
-            aria-current="page">Home</a></li>
-        <li class="nav-item" style="width: 20%;"><a id="data_preparation_link" href="/data" class="nav-link">Data</a>
-        </li>
-        <li class="nav-item" style="width: 20%;"><a id="training_link" href="/train" class="nav-link">Train</a></li>
-        <li class="nav-item" style="width: 20%;"><a id="evaluation_link" href="/evaluation"
-            class="nav-link">Evaluation</a></li>
-        <li class="nav-item" style="width: 20%;"><a id="demo_link" href="/demo" class="nav-link">Demo</a></li>
       </ul>
-    </header>
+      <i style="margin-left: 10px; padding-top: 11px;" type="button" class="fab fa-github"></i>
+      <i style="margin-left: 10px; padding-top: 11px;" type="button" class="fas fa-book"></i>
+      <i style="margin-left: 10px; padding-top: 11px;" type="button" class="fas fa-phone-square"></i>
+      <select class="form-select"
+        style="height: 25px; font-size: 12px; width: 120px; margin-top: 7px; padding: 0; padding-left: 5px;"
+        aria-label="Default select example">
+        <option selected>Expert Level</option>
+        <option value="1">Beginner Level</option>
+        <option value="2">Intermediate</option>
+      </select>
+    </div>
   </div>
 </body>
 

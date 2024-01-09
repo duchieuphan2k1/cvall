@@ -80,13 +80,13 @@ class Infer():
                 model.load_state_dict(ckpt['model'], strict=True)
             except:
                 model.load_state_dict(ckpt, strict=True)
-                # model = ckpt
 
             for layer in model.modules():
                 if isinstance(layer, RepConv):
                     layer.switch_to_deploy()
             model.eval()
         elif engine_type == 'tensorRT':
+            print(self.ckpt_path)
             model = self.build_tensorRT_engine(self.ckpt_path)
         elif engine_type == 'onnx':
             model, self.input_name, self.infer_size, _, _ = self.build_onnx_engine(self.ckpt_path)

@@ -1,53 +1,93 @@
 {% include 'header.html' %}
 
-<style>
-    .wrapper {
-        width: 100%;
-        /*This part is important for centering*/
-        display: grid;
-        place-items: center;
-    }
-
-    .typing-demo {
-        width: 30ch;
-        animation: typing 2s steps(22), blink .5s step-end infinite alternate;
-        white-space: nowrap;
-        overflow: hidden;
-        border-right: 3px solid;
-        font-family: monospace;
-        font-size: 2em;
-    }
-
-    @keyframes typing {
-        from {
-            width: 0
-        }
-    }
-
-    @keyframes blink {
-        50% {
-            border-color: transparent
-        }
-    }
-</style>
-<div class="container">
-    <div class="row">
-        <img style="width: 50%;" src="static/home.gif" alt="">
-        <div style="width: 50%;" class="wrapper">
-            <div class="typing-demo">
-                Let's start our journey!
-                <div>
-                    <a href="/data" class="nav-link">Step 1: Prepare Your Data</a>
-                    <a href="/train" class="nav-link">Step 2: Training Models</a>
-                    <a href="/evaluation" class="nav-link">Step 3: Evaluate Your Models</a>
-                    <a href="/demo" class="nav-link">Step 4: Demo and Enjoy!</a>
-
-                </div>
-            </div>
-            
+<div class="container" style="padding-top: 50px; width: 60%;">
+    <p style="font-size: 20px; font-weight: bold;">CVall Functions</p>
+    <div class="row" style="padding-top: 20px;">
+        <div class="text-center" style="width: 16%;" type="button">
+            <a href="#" style="text-decoration: none; ">
+                <i class="fas fa-swatchbook" style="font-size: 30px; color: #004AAD;"></i>
+                <p style="font-size: 15px; padding-top:5px;">Case Studies</p>
+            </a>
+        </div>
+        <div class="text-center" style="width: 16%;" type="button">
+            <a href="/data" style="text-decoration: none; ">
+                <i class="fas fa-vector-square" style="color: #6E2EED; font-size: 30px"></i>
+                <p style="font-size: 15px; padding-top:5px;">Data Preparation</p>
+            </a>
+        </div>
+        <div class="text-center" style="width: 16%;" type="button">
+            <a href="/train" style="text-decoration: none; ">
+                <i class="fas fa-robot" style="color: #1D81CE; font-size: 30px;"></i>
+                <p style="font-size: 15px; padding-top:5px;">Modeling</p>
+            </a>
+        </div>
+        <div class="text-center" style="width: 16%;" type="button">
+            <a href="/evaluation" style="text-decoration: none; ">
+                <i class="fab fa-searchengin" style="color: #5E17EB; font-size: 30px;"></i>
+                <p style="font-size: 15px; padding-top:5px;">Evaluation</p>
+            </a>
+        </div>
+        <div class="text-center" style="width: 16%;" type="button">
+            <a href="/demo" style="text-decoration: none; ">
+                <i class="fas fa-rocket" style="color: #2EB4E7; font-size: 30px;"></i>
+                <p style="font-size: 15px; padding-top:5px;">Deployment</p>
+            </a>
+        </div>
+        <div class="text-center" style="width: 16%;" type="button">
+            <a href="#" style="text-decoration: none; ">
+                <i class="fas fa-book" style="color: #004AAD; font-size: 30px;"></i>
+                <p style="font-size: 15px; padding-top:5px;">Documentation</p>
+            </a>
         </div>
     </div>
+    <p style="font-size: 20px; font-weight: bold; margin-top: 50px; margin-bottom: 20px;">Running Status</p>
+    <table id="running_task" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Function Name</th>
+                <th>Entity</th>
+                <th>Task</th>
+                <th>Running Time</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Modeling</td>
+                <td>Trash_Detection_Demo1</td>
+                <td>Training</td>
+                <td>09:12:31:23.145</td>
+                <td>
+                    <button class="btn btn-primary"><i class="fab fa-searchengin"></i></button>
+                    <button class="btn btn-danger"><i class="fas fa-times"></i></button>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p style="font-size: 20px; font-weight: bold; margin-top: 50px; margin-bottom: 20px;">Recents</p>
+    <table id="recents_table" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Function Name</th>
+                <th>Entity Link</th>
+                <th>Last View</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="">Modeling</a></td>
+                <td><a href="">Trash_Detection_Demo1</a></td>
+                <td>10 hours ago</td>
+            </tr>
+        </tbody>
+    </table>
     <script>
-        $("#home_link").addClass("active");
+
+        new DataTable('#running_task', {
+        });
+
+        new DataTable('#recents_table', {
+        });
     </script>
 </div>
