@@ -1,0 +1,70 @@
+{% include 'header.html' %}
+
+<style>
+    .cvall_menu:hover {
+        background-color: #F1EFEF;
+        color: #4999D7;
+    }
+    .cvall_link:hover {
+        color: #004AAD!important;
+    }
+</style>
+<div style="margin-left: 30px; padding-right: 30px;">
+    <p style="font-size: 18px; margin-top: 30px;">
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/">Home</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/data/datasets"> > Data Preparation</a>
+    </p>
+
+    <div class="row flex-nowrap"  style="margin-left: 0">
+        <div class="col-auto px-0">
+            <div id="sidebar" class="collapse collapse-horizontal show">
+                <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100" >
+                    <p style="font-size: 18px; font-weight: bold; padding-right: 150px;">CVall Services</p>
+                    <a style="text-decoration: none; color: black;" href="/data/datasets"><p class="cvall_menu" type="button" style="margin: 0;height: 30px; padding-left: 15px; padding-top: 4px;"><i class="fas fa-database" style="color: #004AAD; margin-right: 10px;"></i>Datasets</p> </a>
+                    <a style="text-decoration: none; color: black;" href="/data/guide"><p class="cvall_menu" type="button" style="margin: 0; background-color: #F1EFEF; height: 30px; padding-left: 15px; padding-top: 4px;"><i class="fas fa-book" style="color: #004AAD; margin-right: 10px;"></i>Guide</p></a>                 
+
+                </div>
+            </div>
+        </div>
+        <div class="col-auto cvall_link" id="collapse_menu_button" style="padding-top: 3px; font-size: 14px; color: #4999D7; margin-left: -18px; padding-left: 0px;">
+            <p class="text-decoration-none" type="button" onclick="collapse_menu()">
+                <i id="collapse_icon_1" class="fas fa-chevron-left"></i><i id="collapse_icon_2" class="fas fa-chevron-left"></i>
+            </p>
+        </div>
+        <main class="col ps-md-2 pt-2">
+
+            <div style="font-size: 24px; font-weight: bold; margin-top: -15px; margin-bottom: 15px;">
+                Data Preparation Guides
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        function collapse_menu(){
+            is_shown = $("#sidebar").hasClass("show");
+            console.log(is_shown)
+            if (is_shown==true){
+                $("#collapse_menu_button").css("margin-left", "0px")
+                $("#sidebar").removeClass("show")
+                $("#collapse_icon_1").removeClass("fa-chevron-left")
+                $("#collapse_icon_1").addClass("fa-chevron-right")
+
+                $("#collapse_icon_2").removeClass("fa-chevron-left")
+                $("#collapse_icon_2").addClass("fa-chevron-right")
+
+            }
+            else {
+                $("#collapse_menu_button").css("margin-left", "-18px")
+                $("#sidebar").addClass("show")
+                $("#collapse_icon_1").removeClass("fa-chevron-right")
+                $("#collapse_icon_1").addClass("fa-chevron-left")
+
+                $("#collapse_icon_2").removeClass("fa-chevron-right")
+                $("#collapse_icon_2").addClass("fa-chevron-left")
+            }
+        }
+
+    </script>
+
+</div>

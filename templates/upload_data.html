@@ -1,54 +1,85 @@
 {% include 'header.html' %}
+<style>
+    .cvall_menu:hover {
+        background-color: #F1EFEF;
+        color: #4999D7;
+    }
 
-<div class="container">
-    <br>
-    {% include 'data_process.html' %}
-    <br>
-    <div class="alert alert-info" role="alert">
-        You are uploading data for <strong>{{dataset_name}}</strong>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" onchange="swap_video()" type="checkbox" value="" id="upload_video_choice">
-        <label class="form-check-label" for="upload_video_choice">
-            Upload Video
-        </label>
-    </div>
-    <div class="card text-center">
-        <div class="card-header">
-            {{dataset_name}}
-        </div>
-        <div class="card-body">
-            <p>Number of uploaded images: <span class="badge bg-warning text-dark">{{nbr_images}}</span></p>
+    .cvall_action:hover {
+        color: #4999D7;
+    }
+
+    .cvall_link:hover {
+        color: #004AAD !important;
+    }
+</style>
+<div style="margin-left: 30px; padding-right: 30px;">
+    <p style="font-size: 18px; margin-top: 30px;">
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/">Home</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/data/datasets"> > Data
+            Preparation</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link"
+            href="/review_dataset?dataset_name={{dataset_name}}"> > {{dataset_name}}</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link"
+            href="/upload_data?dataset_name={{dataset_name}}"> > Upload Data</a>
+    </p>
+    <div class="row flex-nowrap" style="margin-left: 0">
+        {% include 'data_menu.html' %}
+        <main class="col ps-md-2 pt-2">
+            <div style="font-size: 24px; font-weight: bold; margin-top: -15px; margin-bottom: 15px;">
+                Data Preparation | {{dataset_name}} | Upload Data
+            </div>
+            <div class="row" style="color: #004AAD;">
+                <!-- Button trigger modal -->
+                <p class="col-auto cvall_action" type="button" style="margin-right: 12px;">
+                    <i class="fas fa-broom"></i> Clear All
+                </p>
+                <p class="col-auto cvall_action form-check">
+                    <input class="form-check-input" onchange="swap_video()" type="checkbox" value=""
+                        id="upload_video_choice">
+                    <label class="form-check-label" for="upload_video_choice" type="button">
+                        Upload Video
+                    </label>
+                </p>
+            </div>
+
             <div id="image_uploader" class="row">
                 <form style="width: 50%;" action="/upload_images" method="post" enctype="multipart/form-data">
-                    <label for="files">Upload Images via files (jpg, ipeg, png, bmp)</label>
+                    <label for="files" style="font-size: 13px;">Choose Images via files (jpg, ipeg, png, bmp)</label>
                     <input type="text" id="dataset_name" name="dataset_name" value="{{dataset_name}}"
-                        style="display: none;">
-                    <input multiple class="form-control" type="file" name="file" id="file" onchange="form.submit()">
+                        style="display: none; font-size: 13px;">
+                    <input multiple class="form-control" type="file" name="file" id="file" onchange="form.submit()"
+                        style="font-size: 13px;">
                 </form>
                 <form style="width: 50%;" action="/upload_images" method="post" enctype="multipart/form-data">
-                    <label for="folder">Upload Images via folder</label>
+                    <label for="folder" style="font-size: 13px;">Choose Images via folder</label>
                     <input type="text" id="dataset_name" name="dataset_name" value="{{dataset_name}}"
-                        style="display: none;">
+                        style="display: none; font-size: 13px;">
                     <input class="form-control" type="file" name="file" id="file" webkitdirectory mozdirectory
-                        onchange="form.submit()">
+                        style="font-size: 13px;" onchange="form.submit()">
                 </form>
             </div>
             <div id="video_uploader">
                 <form id="video_upload_form" class="row" enctype="multipart/form-data">
                     <div style="width: 50%;" class="mb-3">
-                        <label for="video_file" class="form-label">Upload Video (mp4, avi)</label>
-                        <input class="form-control" type="file" name="video_file" id="video_file">
+                        <label for="video_file" class="form-label" style="font-size: 13px;">Choose Video (mp4,
+                            avi)</label>
+                        <input class="form-control" type="file" name="video_file" id="video_file"
+                            style="font-size: 13px;">
                     </div>
                     <input type="text" id="dataset_name" name="dataset_name" value="{{dataset_name}}"
-                        style="display: none;">
+                        style="display: none;" style="font-size: 13px;">
                     <div style="width: 50%;" class="mb-3">
-                        <label for="video_fps" class="form-label">Input FPS for extracting images</label>
-                        <input value="3" type="number" class="form-control" id="video_fps" name="video_fps">
+                        <label for="video_fps" class="form-label" style="font-size: 13px;">Input FPS for extracting
+                            images</label>
+                        <input value="3" type="number" class="form-control" id="video_fps" name="video_fps"
+                            style="font-size: 13px;">
                     </div>
                     <div class="text-center">
-                        <button id="upload_video_button" style="width: 50%;" class="btn btn-primary">Start Extracting
-                            Images</button>
+                        <p class="col-auto cvall_action" id="upload_video_button" type="button"
+                            style="color: #004AAD; font-size: 15px;">
+                            <i class="fas fa-photo-video"></i> Start Extracting Images
+                        </p>
                     </div>
                 </form>
             </div>
@@ -61,18 +92,127 @@
                 <br>
                 <span>We are extracting frames from video.. Please wait until completed!</span>
             </div>
-        </div>
-        <div class="card-footer text-muted">
-            <div class="text-center">
-                <a href="/review_dataset?dataset_name={{dataset_name}}" style="width: 300px;"
-                    class="btn btn-warning">Back to overview</a>
-                <a href="/data_annotation?dataset_name={{dataset_name}}" style="width: 300px;"
-                    class="btn btn-success">Continue to annotation process</a>
+            <br>
+            <div class="row" style="color: #004AAD; font-size: 15px;">
+                <!-- Button trigger modal -->
+                <p class="col-auto cvall_action" type="button" style="margin-right: 12px;">
+                    <i class="fas fa-upload"></i> Add {{nbr_images}} images to the Dataset
+                </p>
             </div>
-        </div>
+            <div class="row">
+                <div class="col-auto" style="font-size: 15px; font-weight: bold;">
+                    Chosen Images
+                </div>
+                <div class="row col d-flex flex-row-reverse">
+                    <div class="row col-auto" style="font-size: 13px;">
+                        Sort by
+                        <div class="col-auto dropdown">
+                            <p class="dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                                aria-expanded="false" style="color: #004AAD;">
+                                Size
+                            </p>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                <li><a class="dropdown-item" href="#">Size</a></li>
+                                <li><a class="dropdown-item" href="#">Name</a></li>
+                                <li><a class="dropdown-item" href="#">Date</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-auto input-group mb-3" style="width: 200px; margin-top: 1px;">
+                        <span class="input-group-text" id="search_upload_images"
+                            style="font-size:11px; height: 13px; padding-top: 7px;"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Search Images" aria-label="Search Images"
+                            aria-describedby="search_upload_images" style="font-size:11px; height: 15px;">
+                    </div>
+
+                    <div class="col-auto" style="font-size: 13px; color: #004AAD;" type="button">
+                        <i class="fas fa-th-large"></i> View
+                    </div>
+                </div>
+            </div>
+            <p style="font-size: 13px;">Number of the chosen images: <span
+                    class="badge bg-warning text-dark">{{nbr_images}}</span></p>
+            <div class="row">
+                <div class="col-auto row" style="width: 20%;">
+                    <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg</p>
+                    <img style=""
+                        src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="">
+                    <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i>
+                    <p style="font-size: 11px;">1200x758</p>
+                </div>
+                <div class="col-auto row" style="width: 20%;">
+                    <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg</p>
+                    <img style=""
+                        src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="">
+                    <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i>
+                    <p style="font-size: 11px;">1200x758</p>
+                </div>
+                <div class="col-auto row" style="width: 20%;">
+                    <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg</p>
+                    <img style=""
+                        src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="">
+                    <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i>
+                    <p style="font-size: 11px;">1200x758</p>
+                </div>
+                <div class="col-auto row" style="width: 20%;">
+                    <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg</p>
+                    <img style=""
+                        src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="">
+                    <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i>
+                    <p style="font-size: 11px;">1200x758</p>
+                </div>
+                <div class="col-auto row" style="width: 20%;">
+                    <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg</p>
+                    <img style=""
+                        src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="">
+                    <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i>
+                    <p style="font-size: 11px;">1200x758</p>
+                </div>
+                <div class="col-auto row" style="width: 20%;">
+                    <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg</p>
+                    <img style=""
+                        src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="">
+                    <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i>
+                    <p style="font-size: 11px;">1200x758</p>
+                </div>
+                <div class="col-auto row" style="width: 20%;">
+                    <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg</p>
+                    <img style=""
+                        src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="">
+                    <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i>
+                    <p style="font-size: 11px;">1200x758</p>
+                </div>
+                <div class="col-auto row" style="width: 20%;">
+                    <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg</p>
+                    <img style=""
+                        src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="">
+                    <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i>
+                    <p style="font-size: 11px;">1200x758</p>
+                </div>
+                <div class="col-auto row" style="width: 20%;">
+                    <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg</p>
+                    <img style=""
+                        src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="">
+                    <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i>
+                    <p style="font-size: 11px;">1200x758</p>
+                </div>
+            </div>
+        </main>
+
     </div>
 
     <script>
+        $("#upload_data_menu").css("background-color", "#F1EFEF");
+
         $("#image_uploader").show();
         $("#video_uploader").hide();
         $("#extracting_progress").hide();

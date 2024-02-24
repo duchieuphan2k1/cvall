@@ -1,179 +1,202 @@
 {% include 'header.html' %}
+<style>
+    .cvall_menu:hover {
+        background-color: #F1EFEF;
+        color: #4999D7;
+    }
 
-<div class="container">
-    <br>
-    {% include 'data_process.html' %}
-    <br>
-    <div class="alert alert-info" role="alert">
-        You are annotating data for <strong>{{dataset_name}}</strong>. This dataset has <strong>{{nbr_images}}</strong>
-        images.
-    </div>
-    <input id="dataset_name" value="{{dataset_name}}" style="display: none;">
-    <div>
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Auto-Annotation by the trained model</h5>
-                    <p class="card-text">Save 95% your time on annotation process!</p>
+    .cvall_action:hover {
+        color: #4999D7 !important;
+    }
 
-                    <div id="auto_annotate_action">
-                        <label for="model_name">Choose your detection model</label>
-                        <select onchange="get_model_classes()" id="model_name" class="form-select" aria-label="">
-                            {% for model_name in models: %}
-                            <option value="{{model_name}}">{{model_name}}</option>
-                            {% endfor %}
-                        </select>
-                        <br>
-                        <div id="model_classes">
-                            <p><strong>Below are the classes of this model. Choose classes that you need!</strong></p>
-                            <div id="classes_checkbox">
-                            </div>
-                            <br>
-                            <p><strong>Then change names of them according to your dataset classes</strong></p>
-                            <div id="modify_label">
-
-                            </div>
-                        </div>
-                        <br>
-                        <div class="text-center">
-                            <button onclick="auto_annotate()" id="auto_annotate_button" style="width: 100%;"
-                                class="btn btn-warning">Auto-Annotate {{dataset_name}}</button>
-                        </div>
+    .cvall_link:hover {
+        color: #004AAD !important;
+    }
+</style>
+<div style="margin-left: 30px; padding-right: 30px;">
+    <p style="font-size: 18px; margin-top: 30px;">
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/">Home</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/data/datasets"> > Data
+            Preparation</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link"
+            href="/review_dataset?dataset_name={{dataset_name}}"> > {{dataset_name}}</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link"
+            href="/data_annotation?dataset_name={{dataset_name}}"> > Data Annotation</a>
+    </p>
+    <div class="row flex-nowrap" style="margin-left: 0">
+        {% include 'data_menu.html' %}
+        <main class="col ps-md-2 pt-2">
+            <div style="font-size: 24px; font-weight: bold; margin-top: -15px; margin-bottom: 15px;">
+                Data Preparation | {{dataset_name}} | Data Annotation
+            </div>
+            <div class="row" style="color: #004AAD;">
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-vector-square"></i> Bounding Box
+                </p>
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-draw-polygon"></i> Polygon
+                </p>
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-magic"></i> Auto-Labeling
+                </p>
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-hand-sparkles"></i> Magic Click
+                </p>
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-search-plus"></i> Zoom In
+                </p>
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-search-minus"></i> Zoom Out
+                </p>
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-file-import"></i> Import Annotation
+                </p>
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-times" style="color: red;"></i> Delete Annotation
+                </p>
+            </div>
+            <div class="row">
+                <div class="col-auto" style="height: 600px!important;">
+                    <div class="text-center" style="font-size: 14px;">
+                        <a href="" class="cvall_action" style="text-decoration: none;">
+                            <i class="fas fa-chevron-left"></i>
+                            Previous</a>
+                        <b> | 512/1032 | </b>
+                        <a href="" class="cvall_action" style="text-decoration: none;">Next <i
+                                class="fas fa-chevron-right"></i></a>
                     </div>
-                    <div id="auto_annotate_tracking" style="display: none;">
-                        <div class="progress">
-                            <div id="auto_annotation_bar"
-                                class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
-                                style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-                        </div>
-                        <br>
-                        <strong>
-                            <p id="annotate_text">Auto-annotate process is running, wait for a while...</p>
-                        </strong>
+                    <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                    <img class="img-fluid" style="height: 100%; width: auto;"
+                        src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="">
+                    <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                    <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                </div>
+                <div class="col-auto" style="min-width: 300px; height: 600px!important;">
+                    <div style="font-size: 15px; font-weight: bold;">
+                        Objects on the image
+                    </div>
+                    <div style="font-size: 12px; ">
+                        <a style="text-decoration: none; color: black;">
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD;">
+                                Plastic
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD;">
+                                Metal
+                            </p>
+                        </a>
+                    </div>
+                    <hr>
+                    <div style="font-size: 15px; font-weight: bold;">
+                        All Images
+                    </div>
+                    <p style="font-size: 12px;"><b>312/1233</b> images have annotated</p>
+                    <div style="font-size: 12px; max-height: 100%; text-overflow: clip;">
+                        <a style="text-decoration: none; color: black; ">
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD; background-color: #d2f8d2;">
+                                image_0001.jpg
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD; background-color: #d2f8d2;">
+                                image_0002.jpg
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD; background-color: #d2f8d2;">
+                                image_0002.jpg
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD; background-color: #F1EFEF;">
+                                image_0002.jpg
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD;">
+                                image_0002.jpg
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD;">
+                                image_0002.jpg
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD;">
+                                image_0002.jpg
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD;">
+                                image_0002.jpg
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD;">
+                                image_0002.jpg
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD;">
+                                image_0002.jpg
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD;">
+                                image_0002.jpg
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD;">
+                                image_0002.jpg
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD;">
+                                image_0002.jpg
+                            </p>
+                        </a>
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD;">
+                                image_0002.jpg
+                            </p>
+                        </a>
+                       
+                        <a>
+                            <p class="cvall_menu" type="button" id="upload_data_menu"
+                                style="margin: 0; height: 20px; padding-left: 5px; padding-top: 1px; color: #004AAD;">
+                                image_0002.jpg
+                            </p>
+                        </a>
                     </div>
                 </div>
             </div>
-        </div>
-        <hr>
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Adjust the auto-annotated data</h5>
-                    <p class="card-text">Simple and Fast review by using LabelMe tool!</p>
-                    <a onclick="open_review()" style="width: 100%;" class="btn btn-primary">Review Annotation</a>
-                </div>
-            </div>
-        </div>
+
+        </main>
+
     </div>
-    <br>
-    <div class="text-center">
-        <a href="/review_dataset?dataset_name={{dataset_name}}" style="width: 300px;" class="btn btn-warning">Back to
-            overview</a>
-        <a href="/data_augment?dataset_name={{dataset_name}}" style="width: 300px;" class="btn btn-success">Continue
-            to augment process</a>
-    </div>
+
     <script>
-        $("#annotation_progress").addClass("active");
-        var status_interval = null;
-        var done_generate = false;
-        get_model_classes();
+        $("#annotation_data_menu").css("background-color", "#F1EFEF");
 
-        function open_review() {
-            $.ajax({
-                type: 'POST',
-                url: "/review_label",
-                data: { dataset_name: $('#dataset_name').val() },
-                success: function (resultData) {
-                    alert(resultData);
-                }
-            });
-        }
-
-        function add_change(id){
-            var class_name = $("#"+id).val()
-            if ($("#"+id).prop('checked') == true) {
-                $("#modify_label").append('<div id="wrapper_'+class_name+'" class="input-group mb-3"><input readonly class="form-control" id="change_'+class_name+'" value="'+class_name+'"><span class="input-group-text"><i class="fas fa-arrow-right"></i></span></div>');
-                $("#wrapper_"+class_name).append('<select id="changed_'+class_name+'" class="form-select" aria-label="">{% for dts_name in all_datasets %} <option value="{{dts_name}}">{{dts_name}}</option> {% endfor %}</select>')
-            } 
-            else{
-                $("#wrapper_"+class_name).remove();
-            }
-        }
-
-        function get_model_classes() {
-            var model_name = $("#model_name").val();
-            $.ajax({
-                url: '/get_model_classes',
-                type: 'POST',
-                data: {
-                    model_name: model_name
-                },
-                success: function (data) {
-                    $("#classes_checkbox").empty()
-                    // <label class="checkbox-inline">
-                    //             <input type="checkbox" value="">Option 1
-                    //         </label>
-                    for (let i = 0; i < data.length; i++) {
-                        $("#classes_checkbox").append('<label style="margin-right: 10px" class="checkbox-inline"><input id="class_'+data[i]+'" onclick=add_change(\'class_'+data[i]+'\') type="checkbox" value="' + data[i] + '"><span class="badge bg-info text-dark">' + data[i] + '</span></label>')
-                    }
-                }
-            });
-        }
-
-        function auto_annotate() {
-            var selected = [];
-            $('#modify_label input').each(function () {
-                selected.push($(this).attr('value'));
-            });
-
-            var changed_names = []
-            for (let i = 0; i < selected.length; i++) {
-                changed_id =  'changed_' + selected[i]
-                console.log(changed_id)
-                changed_names.push($("#" + changed_id).val());
-            }
-            model_name = $("#model_name").val();
-            dataset_name = $("#dataset_name").val();
-
-            console.log(selected);
-            status_interval = setInterval(get_progress, 2000);
-            $("#auto_annotate_action").css("display", 'none');
-            $("#auto_annotate_tracking").css("display", 'block');
-
-            $.ajax({
-                url: '/auto_annotate',
-                type: 'POST',
-                data: {
-                    model_name: model_name,
-                    selected_classes: JSON.stringify(selected),
-                    changed_names: JSON.stringify(changed_names),
-                    dataset_name: dataset_name
-                },
-                success: function (data) {
-                    console.log(data)
-                }
-            });
-        }
-
-        function get_progress() {
-            $.ajax({
-                type: 'POST',
-                url: "{{url_for('get_auto_annotation_progress')}}",
-                data: { dataset_name: $('#dataset_name').val() },
-                success: function (resultData) {
-                    console.log(resultData[0]);
-                    console.log('===');
-                    $('#auto_annotation_bar').attr('aria-valuenow', resultData[0]).css('width', resultData[0] + '%').text(resultData[0] + '%');
-                    if (resultData[0] == 100) {
-                        clearInterval(status_interval);
-                        if (!done_generate) {
-                            $("#annotate_text").text("Auto-annotate process has done. Let's review the annotation!")
-                            console.log("===");
-                        }
-                        done_generate = true;
-                    }
-                }
-            });
-        }
     </script>
 </div>

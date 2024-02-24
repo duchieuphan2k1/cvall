@@ -1,533 +1,59 @@
 {% include 'header.html' %}
+<style>
+  .cvall_menu:hover {
+    background-color: #F1EFEF;
+    color: #4999D7;
+  }
 
-<div class="container">
-  <br>
-  {% include 'data_process.html' %}
-  <br>
-  <div class="alert alert-info" role="alert">
-    Boost accuracy by augmenting data for <strong>{{dataset_name}}</strong>. This dataset has
-    <strong>{{nbr_auto_annotated}}/{{nbr_images}}</strong> annotated images.
-  </div>
-  <div class="card text-center">
-    <div class="card-header">
-      <strong>Step 1. Extract the objects from images</strong>
-    </div>
-    <div class="card-body">
-      <img class="img-fluid" src="static/segment_process.png" alt="">
-      <div class="row">
-        <div class="col-sm-6">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">1. Auto-segment objects</h5>
+  .cvall_action:hover {
+    color: #4999D7 !important;
+  }
 
-              <div id="segment_action">
-                <span><span class="badge bg-danger">Warning</span> If the dataset {{dataset_name}} has segmented before,
-                </span><br>
-                <span class="card-text">those segmentation annotation <strong>will be deleted!</strong></span><br>
-                <br>
-                <a onclick="segment_dataset()" class="btn btn-primary">I understand, start segmenting</a>
-              </div>
+  .cvall_link:hover {
+    color: #004AAD !important;
+  }
+</style>
 
-              <div id="segment_tracking" style="display: none;">
-                <br>
-                <div class="progress">
-                  <div id="segment_bar" class="progress-bar progress-bar-striped progress-bar-animated"
-                    role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%
-                  </div>
-                </div>
-                <br>
-                <strong>
-                  <p id="segment_text">Segmentation process is running, wait for a while...</p>
-                </strong>
-              </div>
-
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-6">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">2. Review segmentation result by annotation tool</h5>
-              <span><span class="badge bg-warning">After auto-segmented</span></span><br>
-              <span class="card-text">Make sure that it has run the Auto-segment process before!</span><br>
-              <br>
-              <a onclick="review_segmentation()" class="btn btn-primary">I'm sure, go reviewing segmentation</a>
-            </div>
-          </div>
-        </div>
+<div style="margin-left: 30px; padding-right: 30px;">
+  <p style="font-size: 18px; margin-top: 30px;">
+    <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/">Home</a>
+    <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/data/datasets"> > Data
+      Preparation</a>
+    <a style="text-decoration: none; color: #4999D7;" class="cvall_link"
+      href="/review_dataset?dataset_name={{dataset_name}}"> > {{dataset_name}}</a>
+    <a style="text-decoration: none; color: #4999D7;" class="cvall_link"
+      href="/data_augment?dataset_name={{dataset_name}}"> > Data Augmentation</a>
+  </p>
+  <div class="row flex-nowrap" style="margin-left: 0">
+    {% include 'data_menu.html' %}
+    <main class="col ps-md-2 pt-2">
+      <div style="font-size: 24px; font-weight: bold; margin-top: -15px; margin-bottom: 15px;">
+        Data Preparation | {{dataset_name}} | Data Augmentation
       </div>
-    </div>
-    <div class="card-footer text-muted">
-      <div id="extract_tracking" style="display: none;">
-        <br>
-        <div class="progress">
-          <div id="extract_bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
-            style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%
-          </div>
-        </div>
-        <br>
-        <strong>
-          <p id="extract_text">Extract objects process is running, wait for a while...</p>
-        </strong>
-      </div>
-      <button id="extract_button" onclick="start_extract_objects()" style="width: 30%; min-width: 200px;"
-        class="btn btn-warning">Start Extract Objects</button>
-    </div>
-    <input id="dataset_name" value="{{dataset_name}}" style="display: none;">
-  </div>
-  <br>
-  <div class="card text-center">
-    <div class="card-header">
-      <strong>Step 2. Augment Data</strong>
-    </div>
-    <div class="card-body text-center">
-      <h5 class="card-title">Random resize, flip, rotate, re-colorize objects and put them into different background
-        images</h5>
-      <img class="img-fluid" src="static/augment_process.png" alt=""><br> <br>
-
-      <div class="row">
-        <div style="min-width: 300px;">
-          <div class="mb-3">
-            <label for="augmented_dataset_name" class="form-label">Augmented Dataset Name</label>
-            <input oninput="check_augmented_dataset()" value="augmented_{{dataset_name}}" type="text"
-              class="form-control" id="augmented_dataset_name">
-            <div id="name_warning" class="form-text">Please input an unique name for augmented dataset</div>
-          </div>
-          <!-- <div class="mb-3">
-            <label for="nbr_augment_images" class="form-label">Number of augment images</label>
-            <input value="3000" type="number" class="form-control" id="nbr_augment_images">
-          </div> -->
-
-          <div class="row">
-            <div style="width: 45%" class="mb-3">
-              <select onchange="get_bgset_info()" id="background_set" class="form-select" aria-label="">
-                <option value="">--- Select a background set ---</option>
-              </select>
-            </div>
-            <div style="width: 10%;" class="mb-3">
-              <span><strong>Or</strong></span>
-            </div>
-            <div style="width: 45%" class="mb-3">
-              <button type="button" style="width: 100%;" class="btn btn-primary" data-bs-toggle="modal"
-                data-bs-target="#add_background_modal">
-                Add new background set
-              </button>
-
-              <!-- Modal -->
-              <div class="modal fade" id="add_background_modal" tabindex="-1" aria-labelledby="" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="add_background_modalLabel">Add new background set</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                      <div class="mb-3">
-                        <label for="new_background_set" class="form-label">Background Set Name</label>
-                        <input oninput="check_background_name()" required type="text" class="form-control"
-                          id="new_background_set">
-                        <div id="bgname_warning" class="form-text">Please input an unique name for background set</div>
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button id="add_bg_button" onclick="add_background_set()" type="button"
-                        class="btn btn-primary">Add</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="background_info">
-            <p>You are using background set <strong class="background_set_text"></strong>. This background set contains
-              <strong id="number_background"></strong> images.
-            </p>
-
-            <form action="" method="POST" id="background_upload_form" class="row" enctype="multipart/form-data">
-              <label for="file">Add new images to <strong class="background_set_text"></strong> ?</label>
-
-              <div class="input-group mb-3">
-                <input multiple class="form-control" type="file" name="background_file[]" id="background_file">
-                <span type="button" onclick="upload_background()" class="input-group-text"
-                  id="basic-addon2">Upload</span>
-              </div>
-              <input name="background_upload_set" id="background_upload_set" type="text" style="display: none;"
-                value="">
-            </form>
-
-          </div>
-        </div>
-        <br>
-        <!-- <div style="min-width: 300px;">
-          <h5 class="form-label">Advance Configuration</h5>
-          <br>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="color_checkbox" value="1">
-            <label class="form-check-label" for="color_checkbox">Augment Color</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="resize_checkbox" value="option2">
-            <label class="form-check-label" for="resize_checkbox">Augment Size</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="geometry_checkbox" value="option2">
-            <label class="form-check-label" for="geometry_checkbox">Augment Geometry</label>
-          </div>
-          <hr>
-          <div id="augment_color">
-            <div class="row g-3 align-items-center">
-              <div class="col-auto">
-                <h5 class="form-label">Augment Color</h5>
-              </div>
-            </div>
-            <div class="row">
-                <div style="width: 50%;">
-                  <div class="col-auto">
-                    <label for="MultiplyHueAndSaturationMin" class="col-form-label">Multiply Hue And Saturation Min</label>
-                  </div>
-                  <div class="col-auto">
-                    <input type="number" step="0.01" id="MultiplyHueAndSaturationMin" class="form-control">
-                  </div>
-
-                  <div class="col-auto">
-                    <label for="ChangeColorTemperatureMin" class="col-form-label">Change Color Temperature Min</label>
-                  </div>
-                  <div class="col-auto">
-                    <input type="number" step="1" id="ChangeColorTemperatureMin" class="form-control">
-                  </div>
-
-                  <div class="col-auto">
-                    <label for="AddMin" class="col-form-label">Add Min</label>
-                  </div>
-                  <div class="col-auto">
-                    <input type="number" step="1" id="AddMin" class="form-control">
-                  </div>
-
-                  <div class="col-auto">
-                    <label for="GammaContrastMin" class="col-form-label">Gamma Contrast Min</label>
-                  </div>
-                  <div class="col-auto">
-                    <input type="number" step="1" id="GammaContrastMin" class="form-control">
-                  </div>
-                </div>
-                <div style="width: 50%;">
-                  <div class="col-auto">
-                    <label for="MultiplyHueAndSaturationMax" class="col-form-label">Multiply Hue And Saturation Max</label>
-                  </div>
-                  <div class="col-auto">
-                    <input type="number" step="0.01" id="MultiplyHueAndSaturationMax" class="form-control">
-                  </div>
-                  <div class="col-auto">
-                    <label for="ChangeColorTemperatureMax" class="col-form-label">Change Color Temperature Max</label>
-                  </div>
-                  <div class="col-auto">
-                    <input type="number" step="1" id="ChangeColorTemperatureMax" class="form-control">
-                  </div>
-                  <div class="col-auto">
-                    <label for="AddMax" class="col-form-label">Add Max</label>
-                  </div>
-                  <div class="col-auto">
-                    <input type="number" step="1" id="AddMax" class="form-control">
-                  </div>
-                  <div class="col-auto">
-                    <label for="GammaContrastMax" class="col-form-label">Gamma Contrast Max</label>
-                  </div>
-                  <div class="col-auto">
-                    <input type="number" step="1" id="GammaContrastMax" class="form-control">
-                  </div>
-                </div>
-
-            </div>
-          </div>
-
-        </div> -->
+      <div class="row" style="color: #004AAD;">
+        <p class="col-auto cvall_action" type="button">
+          <i class="fas fa-plus-circle"></i> Create New Augmentation Dataset
+        </p>
       </div>
 
+      <table id="augmentation_table" class="display" style="width: 100%;">
+        <thead>
+          <tr>
+            <th>Augmentation Name</th>
+            <th>Dataset</th>
+            <th>Date of Created</th>
+            <th>Type</th>
+            <th>Number of Images</th>
+            <th>Number of Objects</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
 
-    </div>
-    <div class="card-footer text-muted">
-      <button onclick="start_augment_data()" id="start_augment_button" style="width: 30%; min-width: 200px;"
-        class="btn btn-warning">Start Augment
-        Data</button>
-
-
-      <div id="augment_tracking" style="display: none;">
-        <br>
-        <div class="progress">
-          <div id="augment_bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
-            style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%
-          </div>
-        </div>
-        <br>
-        <strong>
-          <p id="augment_text">Augment objects process is running, wait for a while...</p>
-        </strong>
-      </div>
-    </div>
+      <script>
+        $("#augment_data_menu").css("background-color", "#F1EFEF");
+        table = $('#augmentation_table').DataTable({})
+      </script>
   </div>
-  <hr>
-  <div class="text-center">
-    <a href="/data_annotation?dataset_name={{dataset_name}}" style="width: 300px;" class="btn btn-primary">Back to
-      annotation</a>
-    <a href="/data_explore?dataset_name={{dataset_name}}" style="width: 300px;" class="btn btn-success">Continue
-      to explore data</a>
-  </div>
-  <br><br>
-
-  <script>
-    $("#augment_progress").addClass("active");
-    var status_interval = null;
-    var done_generate = false;
-
-    var extract_interval = null;
-    var done_extract = false;
-
-    var augment_interval = null;
-    var done_augment = false;
-
-    function get_augment_progress() {
-      $.ajax({
-        type: 'POST',
-        url: "{{url_for('get_augment_progress')}}",
-        data: { augment_dataset_name: $('#augmented_dataset_name').val() },
-        success: function (resultData) {
-          console.log(resultData[0]);
-          console.log('===');
-          $('#augment_bar').attr('aria-valuenow', resultData[0]).css('width', resultData[0] + '%').text(resultData[0] + '%');
-          if (resultData[0] == 100) {
-            clearInterval(augment_interval);
-            if (!done_augment) {
-              $("#augment_text").text("Augment data has done!")
-              console.log("===");
-            }
-            done_augment = true;
-          }
-        }
-      });
-    }
-
-
-    function start_augment_data() {
-      augment_interval = setInterval(get_augment_progress, 1000);
-      $("#start_augment_button").css("display", 'none');
-      $("#augment_tracking").css("display", 'block');
-      $.ajax({
-        type: 'POST',
-        url: "/start_augment",
-        data: {
-          origin_dataset_name: $('#dataset_name').val(),
-          background_set_name: $("#background_set").val(),
-          augment_dataset_name: $("#augmented_dataset_name").val()
-        },
-        success: function (resultData) {
-          alert(resultData);
-        }
-      });
-    }
-
-
-    function start_extract_objects() {
-      extract_interval = setInterval(get_extract_progress, 1000);
-      $("#extract_button").css("display", 'none');
-      $("#extract_tracking").css("display", 'block');
-      $.ajax({
-        type: 'POST',
-        url: "/start_extract_objects",
-        data: { dataset_name: $('#dataset_name').val() },
-        success: function (resultData) {
-          alert(resultData);
-        }
-      });
-    }
-
-    function get_extract_progress() {
-      $.ajax({
-        type: 'POST',
-        url: "{{url_for('get_extract_progress')}}",
-        data: { dataset_name: $('#dataset_name').val() },
-        success: function (resultData) {
-          console.log(resultData[0]);
-          console.log('===');
-          $('#extract_bar').attr('aria-valuenow', resultData[0]).css('width', resultData[0] + '%').text(resultData[0] + '%');
-          if (resultData[0] == 100) {
-            clearInterval(extract_interval);
-            if (!done_extract) {
-              $("#extract_text").text("All objects has been extracted. Let's augment your data!")
-              console.log("===");
-            }
-            done_extract = true;
-          }
-        }
-      });
-    }
-
-    function review_segmentation() {
-      $.ajax({
-        type: 'POST',
-        url: "/review_segmentation",
-        data: { dataset_name: $('#dataset_name').val() },
-        success: function (resultData) {
-          alert(resultData);
-        }
-      });
-    }
-
-    function segment_dataset() {
-      status_interval = setInterval(get_progress, 2000);
-      $("#segment_action").css("display", 'none');
-      $("#segment_tracking").css("display", 'block');
-      $.ajax({
-        url: '/segment_data',
-        type: 'POST',
-        data: {
-          dataset_name: $('#dataset_name').val()
-        },
-        success: function (data) {
-          console.log(data)
-        }
-      });
-    }
-
-    function get_progress() {
-      $.ajax({
-        type: 'POST',
-        url: "{{url_for('get_segmentation_progress')}}",
-        data: { dataset_name: $('#dataset_name').val() },
-        success: function (resultData) {
-          console.log(resultData[0]);
-          console.log('===');
-          $('#segment_bar').attr('aria-valuenow', resultData[0]).css('width', resultData[0] + '%').text(resultData[0] + '%');
-          if (resultData[0] == 100) {
-            clearInterval(status_interval);
-            if (!done_generate) {
-              $("#segment_text").text("Segmentation process has done. Let's review the annotation!")
-              console.log("===");
-            }
-            done_generate = true;
-          }
-        }
-      });
-    }
-
-    check_augmented_dataset();
-    function check_augmented_dataset() {
-      dataset_name = $("#augmented_dataset_name").val();
-      $.ajax({
-        type: 'POST',
-        url: "{{url_for('check_dataset_name')}}",
-        data: {
-          dataset_name: dataset_name
-        },
-        success: function (resultData) {
-          if (resultData == 'true' && dataset_name != '') {
-            $("#name_warning").text("This name is valid.");
-            $("#name_warning").css("color", "green");
-            $("#start_augment_button").removeAttr("disabled")
-          }
-          else {
-            $("#name_warning").text("This name is existed or invalid.");
-            $("#name_warning").css("color", "red");
-            $("#start_augment_button").attr("disabled", "disabled")
-          }
-        }
-      });
-    }
-
-    check_background_name();
-    function check_background_name() {
-      background_set_name = $("#new_background_set").val();
-      $.ajax({
-        type: 'POST',
-        url: "{{url_for('check_background_name')}}",
-        data: {
-          background_set_name: background_set_name
-        },
-        success: function (resultData) {
-          if (resultData == 'true' && background_set_name != '') {
-            $("#bgname_warning").text("This name is valid.");
-            $("#bgname_warning").css("color", "green");
-            $("#add_bg_button").removeAttr("disabled")
-          }
-          else {
-            $("#bgname_warning").text("This name is existed or invalid.");
-            $("#bgname_warning").css("color", "red");
-            $("#add_bg_button").attr("disabled", "disabled")
-          }
-        }
-      });
-    }
-
-    function add_background_set() {
-      background_set_name = $("#new_background_set").val();
-      $.ajax({
-        type: 'POST',
-        url: "{{url_for('add_background_set')}}",
-        data: {
-          background_set_name: background_set_name
-        },
-        success: function (resultData) {
-          $('#add_background_modal').modal('hide');
-          update_background_choices();
-          alert("Add background set successfully!");
-        }
-      });
-    }
-
-    update_background_choices()
-    function update_background_choices() {
-      $.ajax({
-        type: 'POST',
-        url: "{{url_for('get_all_background_sets')}}",
-        data: { data: 'all' },
-        success: function (resultData) {
-          $("#background_set").empty();
-          $("#background_set").append('<option value="">--- Select a background set ---</option>');
-          for (let i = 0; i < resultData.length; i++) {
-            $("#background_set").append('<option id="bg_' + resultData[i] + '" value="' + resultData[i] + '">' + resultData[i] + '</option>');
-          }
-        }
-      });
-    }
-
-    $("#background_info").hide();
-    function get_bgset_info() {
-      background_set = $("#background_set").val();
-      if (background_set == "") {
-        $("#background_info").hide(200);
-      }
-      else {
-        $.ajax({
-          type: 'POST',
-          url: "{{url_for('get_number_background_images')}}",
-          data: { background_set: background_set },
-          success: function (resultData) {
-            $("#background_info").hide(200);
-            $(".background_set_text").text(background_set);
-            $("#background_upload_set").val(background_set);
-            $("#number_background").text(resultData[0]);
-            $("#background_info").show(200);
-          }
-        });
-      }
-    }
-
-    function upload_background() {
-      var form = $("#background_upload_form")[0];
-      var formData = new FormData(form);
-      $.ajax({
-        url: '/upload_background',
-        type: 'POST',
-        data: formData,
-        success: function (data) {
-          alert(data);
-          get_bgset_info();
-          $('#background_file').val('');
-        },
-        cache: false,
-        contentType: false,
-        processData: false
-      });
-    }
-  </script>
-</div>

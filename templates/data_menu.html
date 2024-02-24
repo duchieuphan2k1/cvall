@@ -1,0 +1,82 @@
+<div class="col-auto px-0">
+    <div id="sidebar" class="collapse collapse-horizontal show">
+        <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
+            <p style="font-size: 18px; font-weight: bold; padding-right: 150px;">CVall Services</p>
+            <a style="text-decoration: none; color: black;"
+                href="/review_dataset?dataset_name={{dataset_name}}">
+                <p class="cvall_menu" type="button" id="overview_data_menu"
+                    style="margin: 0;height: 30px; padding-left: 15px; padding-top: 4px;">
+                    <i class="fas fa-images" style="color: #004AAD; margin-right: 10px; width: 8%;"></i>Dataset
+                    Overview
+                </p>
+            </a>
+            <a style="text-decoration: none; color: black;" href="/upload_data?dataset_name={{dataset_name}}">
+                <p class="cvall_menu" type="button" id="upload_data_menu"
+                    style="margin: 0; height: 30px; padding-left: 15px; padding-top: 4px;">
+                    <i class="fas fa-upload" style="color: #004AAD; margin-right: 10px; width: 8%;"></i>Upload
+                    Data
+                </p>
+            </a>
+            <a style="text-decoration: none; color: black;" href="/preview_data?dataset_name={{dataset_name}}">
+                <p class="cvall_menu" type="button" id="preview_data_menu"
+                    style="margin: 0; height: 30px; padding-left: 15px; padding-top: 4px;">
+                    <i class="fas fa-binoculars"
+                        style="color: #004AAD; margin-right: 10px; width: 8%;"></i>Preview Data
+                </p>
+            </a>
+            <a style="text-decoration: none; color: black;"
+                href="/data_annotation?dataset_name={{dataset_name}}">
+                <p class="cvall_menu" type="button" id="annotation_data_menu"
+                    style="margin: 0; height: 30px; padding-left: 15px; padding-top: 4px;">
+                    <i class="fas fa-vector-square"
+                        style="color: #004AAD; margin-right: 10px; width: 8%;"></i>Data Annotation
+                </p>
+            </a>
+            <a style="text-decoration: none; color: black;" href="/data_augment?dataset_name={{dataset_name}}">
+                <p class="cvall_menu" type="button" id="augment_data_menu"
+                    style="margin: 0; height: 30px; padding-left: 15px; padding-top: 4px;">
+                    <i class="fas fa-file-image" style="color: #004AAD; margin-right: 10px; width: 8%;"></i>Data
+                    Augmentation
+                </p>
+            </a>
+            <a style="text-decoration: none; color: black;" href="#">
+                <p class="cvall_menu" type="button" id="data_guide_menu"
+                    style="margin: 0; height: 30px; padding-left: 15px; padding-top: 4px;">
+                    <i class="fas fa-book" style="color: #004AAD; margin-right: 10px; width: 8%;"></i>Guide
+                </p>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="col-auto cvall_link" id="collapse_menu_button"
+    style="padding-top: 3px; font-size: 14px; color: #4999D7; margin-left: -18px; padding-left: 0px;">
+    <p class="text-decoration-none" type="button" onclick="collapse_menu()">
+        <i id="collapse_icon_1" class="fas fa-chevron-left"></i><i id="collapse_icon_2"
+            class="fas fa-chevron-left"></i>
+    </p>
+</div>
+<script>
+        function collapse_menu() {
+            is_shown = $("#sidebar").hasClass("show");
+            console.log(is_shown)
+            if (is_shown == true) {
+                $("#collapse_menu_button").css("margin-left", "0px")
+                $("#sidebar").removeClass("show")
+                $("#collapse_icon_1").removeClass("fa-chevron-left")
+                $("#collapse_icon_1").addClass("fa-chevron-right")
+
+                $("#collapse_icon_2").removeClass("fa-chevron-left")
+                $("#collapse_icon_2").addClass("fa-chevron-right")
+
+            }
+            else {
+                $("#collapse_menu_button").css("margin-left", "-18px")
+                $("#sidebar").addClass("show")
+                $("#collapse_icon_1").removeClass("fa-chevron-right")
+                $("#collapse_icon_1").addClass("fa-chevron-left")
+
+                $("#collapse_icon_2").removeClass("fa-chevron-right")
+                $("#collapse_icon_2").addClass("fa-chevron-left")
+            }
+        }
+</script>

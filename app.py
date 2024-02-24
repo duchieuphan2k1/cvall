@@ -43,9 +43,13 @@ def home():
 
     return render_template("home.html")
 
-@app.route("/data")
+@app.route("/data/datasets")
 def data():
     return render_template("data.html")
+
+@app.route("/data/guide")
+def data_guide():
+    return render_template("data_guide.html")
 
 @app.route("/review_dataset")
 def review_dataset():
@@ -139,6 +143,12 @@ def upload_data():
     dataset_name = request.args.get("dataset_name")
     dataset_info = dataset_handler.get_info_by_name(dataset_name)
     return render_template("upload_data.html", dataset_name=dataset_name, nbr_images=dataset_info['nbr_images'])
+
+@app.route("/preview_data")
+def preview_data():
+    dataset_name = request.args.get("dataset_name")
+    dataset_info = dataset_handler.get_info_by_name(dataset_name)
+    return render_template("dataset_image_preview.html", dataset_name=dataset_name, nbr_images=dataset_info['nbr_images'])
 
 @app.route("/data_annotation")
 def data_annotation():
@@ -473,7 +483,7 @@ def add_new_dataset():
         dataset_decs = request.form.get("dataset_decs")
         dataset_handler.create_dataset(dataset_name, dataset_secarino, dataset_type, dataset_decs, class_list)
     
-    return redirect('/data')
+    return redirect('/data/datasets')
 
 @app.route("/add_new_model", methods=["POST"])
 def add_new_model():
@@ -491,7 +501,7 @@ def delete_dataset():
     if request.method == 'POST':
         dataset_name = request.form.get("dl_dataset")
         dataset_handler.delete_dataset(dataset_name)
-    return redirect("/data")
+    return redirect("/data/datasets")
 
 @app.route('/delete_model', methods=["POST"])
 def delete_model():
