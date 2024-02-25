@@ -1,129 +1,283 @@
 {% include 'header.html' %}
+<style>
+    .cvall_menu:hover {
+        background-color: #F1EFEF;
+        color: #4999D7;
+    }
 
-<div class="container">
-    <div id="tracking_training">
-        <div id="model_loader">
-            <div class="d-flex align-items-center justify-content-center">
-                <img style="height: 300px;" class="img-fluid" src="static/training.gif" alt="">
-            </div>
-            <div class="text-center">
-                <h5>Epoch: <strong id="current_epoch_text"></strong> / <strong
-                        id="total_epochs_text">{{model_info['train']['total_epochs']}}</strong>
-                </h5>
-            </div>
-            <br>
-            <div class="text-center">
-                <button style="width: 200px;" class="btn btn-danger" onclick="terminate_training()">Terminate Training</button>
-            </div>
-            <br>
-        </div>
+    .cvall_action:hover {
+        color: #4999D7 !important;
+    }
 
-        <div>
-            <div class="text-center">
-                <h5>Training Results...</h5>
+    .cvall_link:hover {
+        color: #004AAD !important;
+    }
+</style>
+<div style="margin-left: 30px; padding-right: 30px;">
+    <p style="font-size: 18px; margin-top: 30px;">
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/">Home</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/train"> > Modeling</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link"
+            href="review_model?model_name={{model_name}}"> > {{model_name}}</a>
+    </p>
+    <div class="row flex-nowrap" style="margin-left: 0">
+        {% include 'training_menu.html' %}
+        <main class="col ps-md-2 pt-2">
+            <div style="font-size: 24px; font-weight: bold; margin-top: -15px; margin-bottom: 15px;">
+                Modeling | {{model_name}} | Overview
             </div>
-            <div id="result_images">
+            <div class="row" style="color: #004AAD;">
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-sync-alt"></i> Reset to Defaults
+                </p>
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-download"></i> Download
+                </p>
+                <p class="col-auto cvall_action" type="button">
+                    <i class="far fa-clone"></i> Clone
+                </p>
             </div>
-        </div>
+
+            <div>
+                <div class="row">
+                    <div class="col-auto" style="border: 0px; width: 45%; min-width: 300px; font-size: 13px;">
+                        <form>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_name" class="col-sm-4 col-form-label"><b>Model Name</b></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" value="{{model_name}}" id="input_model_name"
+                                        style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_use_case" class="col-sm-4 col-form-label"><b>Use Case</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="input_model_use_case"
+                                        style="font-size: 13px; max-width: 400px;">
+                                        <option>Object Detection</option>
+                                        <option>Object Segmentation</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_trainset" class="col-sm-4 col-form-label"><b>Train Dataset</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="input_model_trainset"
+                                        style="font-size: 13px; max-width: 400px;">
+                                        <option>Train01-augment</option>
+                                        <option>Train01</option>
+                                    </select>
+                                    <small id="trainset_help" class="form-text text-muted">You are using the augmented
+                                        dataset of Dataset Train01</small>
+                                    <br>
+                                    <input class="form-check-input" type="checkbox" value=""
+                                        id="input_train_merge_origin">
+                                    <label class="form-check-label" for="input_train_merge_origin">
+                                        Merge Origin?
+                                    </label>
+
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_testset" class="col-sm-4 col-form-label"><b>Test Dataset</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="input_model_testset"
+                                        style="font-size: 13px; max-width: 400px;">
+                                        <option>Test01-augment</option>
+                                        <option>Test01</option>
+                                    </select>
+                                    <small id="testset_help" class="form-text text-muted">You are using the augmented
+                                        dataset of Dataset Test01</small>
+                                    <br>
+                                    <input class="form-check-input" type="checkbox" value=""
+                                        id="input_test_merge_origin">
+                                    <label class="form-check-label" for="input_test_merge_origin">
+                                        Merge Origin? 
+                                    </label>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_description" class="col-sm-4 col-form-label"><b>Description</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <textarea type="text" class="form-control" id="input_model_description"
+                                        style="font-size: 13px; max-width: 400px;">This is the sample des</textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_classes" class="col-sm-4 col-form-label"><b>Model Classes</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <div id="input_model_classes" style="font-size: 13px; max-width: 400px; margin-top: 8px;">
+                                        <span style="background-color: #004AAD;" class="badge badge-pill badge-primary"><i class="fas fa-plus-circle"></i> Add More ...</span>
+
+                                        <span style="background-color: #0097B2;" class="badge badge-pill badge-primary">Plastic <i class="fas fa-times"></i></span>
+                                        <span style="background-color: #0097B2;" class="badge badge-pill badge-primary">Metal <i class="fas fa-times"></i></span>
+                                        <span style="background-color: #0097B2;" class="badge badge-pill badge-primary">Glass <i class="fas fa-times"></i></span>
+                                        <span style="background-color: #0097B2;" class="badge badge-pill badge-primary">Paper <i class="fas fa-times"></i></span>
+                                        <span style="background-color: #0097B2;" class="badge badge-pill badge-primary">Primary <i class="fas fa-times"></i></span>
+                                        <span style="background-color: #0097B2;" class="badge badge-pill badge-primary">Primary <i class="fas fa-times"></i></span>
+                                        <span style="background-color: #0097B2;" class="badge badge-pill badge-primary">Primary <i class="fas fa-times"></i></span>
+                                        <span style="background-color: #0097B2;" class="badge badge-pill badge-primary">Primary <i class="fas fa-times"></i></span>
+                                        <span style="background-color: #0097B2;" class="badge badge-pill badge-primary">Primary <i class="fas fa-times"></i></span>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_architect" class="col-sm-4 col-form-label"><b>Architecture</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="input_model_architect"
+                                        style="font-size: 13px; max-width: 400px;">
+                                        <option>Damo-YOLO</option>
+                                        <option>YOLO-v8</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <div><b>Model Configuration for DAMO-YOLO</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></div>
+                            </div>
+                            <br>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_size" class="col-sm-4 col-form-label"><b>Model Size</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="input_model_size"
+                                        style="font-size: 13px; max-width: 400px;">
+                                        <option>Damo-YOLO S</option>
+                                        <option>Damo-YOLO M</option>
+                                    </select>
+                                    <small id="model_size_info" class="form-text text-muted">Estimate running time on GTX3090Ti: : 75 FPS (0.013s per image)</small>
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_backbone" class="col-sm-4 col-form-label"><b>Backbone</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="input_model_backbone"
+                                        style="font-size: 13px; max-width: 400px;">
+                                        <option>CSP-Net</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_backbone" class="col-sm-4 col-form-label"><b>Activate Function</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="input_model_backbone"
+                                        style="font-size: 13px; max-width: 400px;">
+                                        <option>Silu</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br>
+                            <button class="btn btn-primary" style="border-radius: 15px; font-size: 13px; width: 200px;">Save</button>
+                        </form>
+                    </div>
+                    <div class="col-auto" style="width: 45%;">
+                        <div>
+                            <div class="chart-container col-auto"
+                                style="position: relative; min-width: 300px; min-height: 300px; width: 100%;">
+                                <canvas id="model_comparison_chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </main>
     </div>
-
-    <div class="card text-center" id="training_action">
-        <div class="card-header">
-            <strong>{{model_name}}</strong>
-        </div>
-        <div class="card-body">
-            <h5 class="card-title">Training for <strong>{{model_name}}</strong></h5>
-            <input type="text" style="display: none;" id="model_name" value="{{model_name}}">
-            <div class="d-flex align-items-center justify-content-center">
-                <div style="width: 200px; margin-right: 10px;" class="mb-3">
-                    <label for="trainset" class="form-label">Train Dataset</label>
-                    <input type="text" value="{{model_info['dataset']['trainset']}}" class="form-control" id="trainset"
-                        aria-describedby="trainset" readonly>
-                </div>
-                <div style="width: 200px;" class="mb-3">
-                    <label for="testset" class="form-label">Test Dataset</label>
-                    <input type="text" value="{{model_info['dataset']['testset']}}" class="form-control" id="testset"
-                        aria-describedby="testset" readonly>
-                </div>
-            </div>
-            <div class="d-flex align-items-center justify-content-center">
-                <div style="width: 200px;" class="mb-3">
-                    <label for="number_epochs" class="form-label">Number of Epochs</label>
-                    <input type="number" class="form-control" value="{{model_info['train']['total_epochs']}}"
-                        id="number_epochs" aria-describedby="number_epochsHelp">
-                </div>
-            </div>
-        </div>
-        <div class="card-footer text-muted">
-            <a href="#" style="width: 200px;" id="start_train_button" onclick="start_train()"
-                class="btn btn-warning">Start Train</a>
-        </div>
-    </div>
-    <script>
-        $("#tracking_training").hide();
-        $("#training_link").addClass("active");
-        var status_interval = null;
-        var done_training = false;
-
-        function terminate_training(){
-            model_name = $("#model_name").val();
-            $.ajax({
-                type: 'POST',
-                url: "/terminate_training",
-                data: {
-                    model_name: model_name,
-                },
-                success: function (resultData) {
-                    clearInterval(status_interval);
-                    alert("Terminating...");
-                }
-            });
-        }
-
-        var image_index = 0
-        function get_training_status() {
-            model_name = $("#model_name").val();
-            $.ajax({
-                type: 'POST',
-                url: "/get_training_status",
-                data: {
-                    model_name: model_name,
-                },
-                success: function (resultData) {
-                    $("#current_epoch_text").text(resultData['current_epoch']);
-                    $("#result_images").empty();
-                    for (let i = 0; i < resultData['image_path'].length; i++) {
-                        $("#result_images").append("<img id='img"+image_index+"' class='img-fluid' src='" + resultData['image_path'][i] + "?"+ new Date().getTime()+"'>");
-                        image_index+=1;
-                    };
-                }
-            });
-        }
-
-        function start_train() {
-            model_name = $("#model_name").val();
-            trainset = $("#trainset").val();
-            testset = $("#testset").val();
-            number_epochs = $("#number_epochs").val();
-            $("#training_action").hide();
-            $("#tracking_training").show();
-            status_interval = setInterval(get_training_status, 5000);
-
-            $.ajax({
-                type: 'POST',
-                url: "/start_train",
-                data: {
-                    model_name: model_name,
-                    trainset: trainset,
-                    testset: testset,
-                    number_epochs: number_epochs
-                },
-                success: function (resultData) {
-                    clearInterval(status_interval);
-                    alert(resultData);
-                    location.reload();
-                }
-            });
-        }
-    </script>
 </div>
+<script>
+    $("#tracking_training").hide();
+    $("#model_overview_menu").css("background-color", "#F1EFEF");
+    const model_comparison_chart = document.getElementById('model_comparison_chart');
+    new Chart(model_comparison_chart, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    label: 'The Damo-YOLO',
+                    data: [{
+                        x: 0,
+                        y: 0
+                    }, {
+                        x: 1,
+                        y: 10
+                    }, {
+                        x: 2,
+                        y: 5
+                    }, {
+                        x: 3,
+                        y: 5.5
+                    }],
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                },
+                {
+                    label: 'The YOLO-v5',
+                    data: [{
+                        x: 0,
+                        y: 1
+                    }, {
+                        x: 1,
+                        y: 3
+                    }, {
+                        x: 2,
+                        y: 4
+                    }, {
+                        x: 3,
+                        y: 6
+                    }],
+                    borderColor: 'rgb(255,145,77)',
+                    backgroundColor: 'rgb(255,145,77)',
+                },
+                {
+                    label: 'The YOLO-v8',
+                    data: [{
+                        x: 0,
+                        y: 5
+                    }, {
+                        x: 1,
+                        y: 2
+                    }, {
+                        x: 2,
+                        y: 1
+                    }, {
+                        x: 3,
+                        y: 7
+                    }],
+                    borderColor: 'rgb(46,180,231)',
+                    backgroundColor: 'rgb(46,180,231)',
+                }
+            ]
+        },
+
+        options: {
+            aspectRatio: 1,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Comparison of model on COCO-val Dataset',
+                }
+
+            }
+        }
+    });
+</script>

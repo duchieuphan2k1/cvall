@@ -65,6 +65,14 @@ def review_model():
     model_status_info = status_handler.get_info()
     return render_template("model_overview.html", model_name=model_name, model_info=model_info, model_status_info=model_status_info)
 
+@app.route("/train_model")
+def train_model():
+    model_name = request.args.get("model_name")
+    status_handler = StatusHandler(model_name)
+    model_info = model_handler.get_model_info_by_name(model_name)
+    model_status_info = status_handler.get_info()
+    return render_template("train_model.html", model_name=model_name, model_info=model_info, model_status_info=model_status_info)
+
 @app.route("/get_training_status", methods=["POST"])
 def get_training_status():
     model_name = request.form.get("model_name")

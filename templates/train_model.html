@@ -1,0 +1,486 @@
+{% include 'header.html' %}
+<style>
+    .cvall_menu:hover {
+        background-color: #F1EFEF;
+        color: #4999D7;
+    }
+
+    .cvall_action:hover {
+        color: #4999D7 !important;
+    }
+
+    .cvall_link:hover {
+        color: #004AAD !important;
+    }
+</style>
+<div style="margin-left: 30px; padding-right: 30px;">
+    <p style="font-size: 18px; margin-top: 30px;">
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/">Home</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/train"> > Modeling</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link"
+            href="review_model?model_name={{model_name}}"> > {{model_name}}</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link"
+            href="/train_model?model_name={{model_name}}"> > Training</a>
+    </p>
+    <div class="row flex-nowrap" style="margin-left: 0">
+        {% include 'training_menu.html' %}
+        <main class="col ps-md-2 pt-2">
+            <div style="font-size: 24px; font-weight: bold; margin-top: -15px; margin-bottom: 15px;">
+                Modeling | {{model_name}} | Training
+            </div>
+            <div class="row" style="color: #004AAD;">
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-sync-alt"></i> Reset to Defaults
+                </p>
+                <p class="col-auto cvall_action" type="button">
+                    <i class="far fa-clone"></i> Clone
+                </p>
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fab fa-searchengin"></i> Evaluation
+                </p>
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-rocket"></i> Deploy
+                </p>
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-sync"></i> Refresh
+                </p>
+            </div>
+
+            <div>
+                <div class="row">
+                    <div class="col-auto" style="border: 0px; width: 45%; min-width: 300px; font-size: 13px;">
+                        <form>
+                            <div class="form-group">
+                                <div class="row">
+                                    <button class="btn btn-primary col-auto"
+                                        style="border-radius: 15px; font-size: 13px; width: 200px; margin-right: 10px; margin-left: 10px;">Start
+                                        Train</button>
+                                    <button class="btn btn-danger col-auto"
+                                        style="border-radius: 15px; font-size: 13px; width: 200px;">Terminate
+                                        Training</button>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <div><b>Hyperparameter</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_batch_size" class="col-sm-4 col-form-label"><b>Batch Size</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="1" class="form-control" value="32"
+                                        id="input_model_batch_size" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_num_workers" class="col-sm-4 col-form-label"><b>Num Workers</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="1" class="form-control" value="32"
+                                        id="input_model_num_workers" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_eval_frequence" class="col-sm-4 col-form-label"><b>Eval
+                                        Frequence</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="1" class="form-control" value="32"
+                                        id="input_model_eval_frequence" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_log_frequence" class="col-sm-4 col-form-label"><b>Log
+                                        Frequence</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="1" class="form-control" value="32"
+                                        id="input_model_log_frequence" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_ema" class="col-sm-4 col-form-label"><b>Enable Ema</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="input_model_ema"
+                                        style="font-size: 13px; max-width: 400px;">
+                                        <option>True</option>
+                                        <option>False</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_ema_momentum" class="col-sm-4 col-form-label"><b>Ema
+                                        Momentum</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.001" class="form-control" value="32"
+                                        id="input_model_ema_momentum" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_warmup_lr" class="col-sm-4 col-form-label"><b>Warmup LR</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.001" class="form-control" value="32"
+                                        id="input_model_warmup_lr" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_min_lr_ratio" class="col-sm-4 col-form-label"><b>Min LR
+                                        Ratio</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.001" class="form-control" value="32"
+                                        id="input_model_min_lr_ratio" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_no_aug_epoch" class="col-sm-4 col-form-label"><b>No Aug
+                                        Epoch</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="1" class="form-control" value="32"
+                                        id="input_model_no_aug_epoch" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_resume_by" class="col-sm-4 col-form-label"><b>Resume By</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="input_model_resume_by"
+                                        style="font-size: 13px; max-width: 400px;">
+                                        <option>epoch_23</option>
+                                        <option>epoch_24</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_sgd_momentum" class="col-sm-4 col-form-label"><b>SGD
+                                        Momentum</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.001" class="form-control" value="32"
+                                        id="input_model_sgd_momentum" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_weight_decay" class="col-sm-4 col-form-label"><b>Weight
+                                        Decay</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.001" class="form-control" value="32"
+                                        id="input_model_weight_decay" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_nesterov" class="col-sm-4 col-form-label"><b>Nesterov</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.001" class="form-control" value="32"
+                                        id="input_model_nesterov" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_lr" class="col-sm-4 col-form-label"><b>Learning Rate</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.001" class="form-control" value="32"
+                                        id="input_model_lr" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_test_batch_size" class="col-sm-4 col-form-label"><b>Test Batch
+                                        Size</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="1" class="form-control" value="32"
+                                        id="input_model_test_batch_size" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <label for="input_model_num_epoch" class="col-sm-4 col-form-label"><b>Num Epochs</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="1" class="form-control" value="32"
+                                        id="input_model_num_epoch" style="font-size: 13px; max-width: 400px;">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom:5px">
+                                <div><b>Online Augmentation</b>
+                                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-auto" style="width: 45%; font-size: 13px;">
+                        <div class="form-group row" style="margin-bottom:5px">
+                            <div><b>Training in progess... Epoch 120/300</b>
+                                <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom:5px">
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 45%;" aria-valuenow="45"
+                                    aria-valuemin="0" aria-valuemax="100">45%</div>
+                            </div>
+                        </div>
+                        <br>
+                        <div>
+                            <div class="row" style="margin-bottom: 30px;">
+                                <div class="chart-container col-auto" style="position: relative; min-width: 300px;">
+                                    <canvas id="loss_value_chart"></canvas>
+                                </div>
+                                <div class="chart-container col-auto" style="position: relative; height: 300px;">
+                                    <canvas id="map_chart"></canvas>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="chart-container col-auto" style="position: relative; height: 300px;">
+                                    <canvas id="ap50_chart"></canvas>
+                                </div>
+                                <div class="chart-container col-auto" style="position: relative; height: 300px;">
+                                    <canvas id="ap75_chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script>
+    $("#tracking_training").hide();
+    $("#model_training_menu").css("background-color", "#F1EFEF");
+
+    const loss_value_chart = document.getElementById('loss_value_chart');
+    const map_chart = document.getElementById('map_chart');
+    const ap50_chart = document.getElementById('ap50_chart');
+    const ap75_chart = document.getElementById('ap75_chart');
+
+    new Chart(loss_value_chart, {
+        type: 'line',
+        data: {
+            labels: ['1', '2', '3', '4'],
+            datasets: [{
+                label: 'Trainset',
+                data: [0.7, 0.4, 0.3, 0.1],
+                borderWidth: 1,
+                backgroundColor: [
+                    'rgb(8,80,176)',
+                ],
+            },
+            {
+                label: 'Testset',
+                data: [1.1, 0.8, 0.6, 0.3],
+                borderWidth: 1,
+                backgroundColor: [
+                    'rgb(108,229,232)',
+                ],
+            }]
+        },
+
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'The Loss Value',
+                }
+
+            }
+        }
+    });
+    new Chart(map_chart, {
+        type: 'line',
+        data: {
+            labels: ['1', '2', '3', '4'],
+            datasets: [{
+                label: 'Trainset',
+                data: [0.1, 0.3, 0.4, 0.55],
+                borderWidth: 1,
+                backgroundColor: [
+                    'rgb(8,80,176)',
+                ],
+            },
+            {
+                label: 'Testset',
+                data: [0.02, 0.32, 0.25, 0.45],
+                borderWidth: 1,
+                backgroundColor: [
+                    'rgb(108,229,232)',
+                ],
+            }
+            ]
+        },
+
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'The mAP',
+                }
+
+            }
+        }
+    });
+
+    new Chart(ap50_chart, {
+        type: 'line',
+        data: {
+            labels: ['1', '2', '3', '4'],
+            datasets: [{
+                label: 'Trainset',
+                data: [0.1, 0.3, 0.4, 0.55],
+                borderWidth: 1,
+                backgroundColor: [
+                    'rgb(8,80,176)',
+                ],
+            },
+            {
+                label: 'Testset',
+                data: [0.02, 0.32, 0.25, 0.45],
+                borderWidth: 1,
+                backgroundColor: [
+                    'rgb(108,229,232)',
+                ],
+            }
+            ]
+        },
+
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'The AP50',
+                }
+
+            }
+        }
+    });
+    new Chart(ap75_chart, {
+        type: 'line',
+        data: {
+            labels: ['1', '2', '3', '4'],
+            datasets: [{
+                label: 'Trainset',
+                data: [0.1, 0.3, 0.4, 0.55],
+                borderWidth: 1,
+                backgroundColor: [
+                    'rgb(8,80,176)',
+                ],
+            },
+            {
+                label: 'Testset',
+                data: [0.02, 0.32, 0.25, 0.45],
+                borderWidth: 1,
+                backgroundColor: [
+                    'rgb(108,229,232)',
+                ],
+            }
+            ]
+        },
+
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'The AP75',
+                }
+
+            }
+        }
+    });
+
+    var status_interval = null;
+    var done_training = false;
+
+    function terminate_training() {
+        model_name = $("#model_name").val();
+        $.ajax({
+            type: 'POST',
+            url: "/terminate_training",
+            data: {
+                model_name: model_name,
+            },
+            success: function (resultData) {
+                clearInterval(status_interval);
+                alert("Terminating...");
+            }
+        });
+    }
+
+    var image_index = 0
+    function get_training_status() {
+        model_name = $("#model_name").val();
+        $.ajax({
+            type: 'POST',
+            url: "/get_training_status",
+            data: {
+                model_name: model_name,
+            },
+            success: function (resultData) {
+                $("#current_epoch_text").text(resultData['current_epoch']);
+                $("#result_images").empty();
+                for (let i = 0; i < resultData['image_path'].length; i++) {
+                    $("#result_images").append("<img id='img" + image_index + "' class='img-fluid' src='" + resultData['image_path'][i] + "?" + new Date().getTime() + "'>");
+                    image_index += 1;
+                };
+            }
+        });
+    }
+
+    function start_train() {
+        model_name = $("#model_name").val();
+        trainset = $("#trainset").val();
+        testset = $("#testset").val();
+        number_epochs = $("#number_epochs").val();
+        $("#training_action").hide();
+        $("#tracking_training").show();
+        status_interval = setInterval(get_training_status, 5000);
+
+        $.ajax({
+            type: 'POST',
+            url: "/start_train",
+            data: {
+                model_name: model_name,
+                trainset: trainset,
+                testset: testset,
+                number_epochs: number_epochs
+            },
+            success: function (resultData) {
+                clearInterval(status_interval);
+                alert(resultData);
+                location.reload();
+            }
+        });
+    }
+</script>
+</div>
