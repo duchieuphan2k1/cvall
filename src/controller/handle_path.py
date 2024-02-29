@@ -1,5 +1,5 @@
 import os
-from utils.handle_config import ConfigHandler
+from src.controller.handle_config import ConfigHandler
 
 class PathHandler:
     def __init__(self):

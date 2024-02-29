@@ -1,6 +1,6 @@
-from utils.handle_config import ConfigHandler
-from utils.handle_path import PathHandler
-from utils.handle_dataset import DatasetHandler
+from src.controller.handle_config import ConfigHandler
+from src.controller.handle_path import PathHandler
+from src.controller.handle_dataset import DatasetHandler
 import os
 import shutil
 import yaml

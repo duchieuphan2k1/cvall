@@ -1,7 +1,7 @@
-from damo_yolo2.tools.demo import InferRunner
-from utils.handle_path import PathHandler
-from utils.handle_dataset import DatasetHandler
-from utils.handle_model import ModelHandler
+from src.object_detection_models.damo_yolo2.tools.demo import InferRunner
+from src.controller.handle_path import PathHandler
+from src.controller.handle_dataset import DatasetHandler
+from src.controller.handle_model import ModelHandler
 import os
 import shutil
 import json

@@ -18,7 +18,7 @@ from damo.utils import get_model_info, vis, postprocess
 from damo.utils.demo_utils import transform_img
 from damo.structures.image_list import ImageList
 from damo.structures.bounding_box import BoxList
-from FastSAM2.fastsam_inference import FastFAM_Infer
+from src.segmentation_models.FastSAM2.fastsam_inference import FastFAM_Infer
 IMAGES=['png', 'jpg']
 VIDEOS=['mp4', 'avi']
 

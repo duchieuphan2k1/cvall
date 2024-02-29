@@ -23,8 +23,8 @@ from damo.utils import (MeterBuffer, get_model_info, get_rank, gpu_mem_usage,
 from torch.nn import GroupNorm, LayerNorm
 from torch.nn.modules.batchnorm import _BatchNorm
 # from evaluation.predict_dataset import PredictDataset
-from utils.handle_path import PathHandler
-from utils.handle_status import StatusHandler
+from src.controller.handle_path import PathHandler
+from src.controller.handle_status import StatusHandler
 NORMS = (GroupNorm, LayerNorm, _BatchNorm)
 
 def mkdir(path):

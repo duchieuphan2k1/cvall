@@ -1,6 +1,0 @@
-test:
-  ann_file: datasets/raw_data/coco_annotations/annotation.json
-  img_dir: datasets/raw_data/images
-train:
-  ann_file: datasets/augmented_all_dataset4/coco_annotations/annotation.json
-  img_dir: datasets/augmented_all_dataset4/images

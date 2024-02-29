@@ -4,12 +4,12 @@ import shutil
 import json
 import cv2
 from tqdm import tqdm
-from FastSAM2.fastsam import FastSAM, FastSAMPrompt
-from utils.handle_path import PathHandler
+from src.segmentation_models.FastSAM2.fastsam import FastSAM, FastSAMPrompt
+from src.controller.handle_path import PathHandler
 
 class FastFAM_Infer:
     def __init__(self):
-        self.model = FastSAM('FastSAM2/weights/FastSAM-x.pt')
+        self.model = FastSAM('data/default_weights/FastSAM2/FastSAM-x.pt')
         self.path_handler = PathHandler()
         self.DEVICE = 'cuda'
 

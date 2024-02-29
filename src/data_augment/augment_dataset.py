@@ -5,9 +5,9 @@ import json
 import random
 from PIL import Image, ImageOps, ImageChops
 import numpy as np
-from utils.handle_path import PathHandler
-from utils.handle_dataset import DatasetHandler
-from utils.handle_config import ConfigHandler
+from src.controller.handle_path import PathHandler
+from src.controller.handle_dataset import DatasetHandler
+from src.controller.handle_config import ConfigHandler
 import imgaug as ia
 import imgaug.augmenters as iaa
 

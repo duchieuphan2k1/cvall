@@ -1,15 +1,15 @@
 from flask import (Flask, flash, Response, render_template, request, redirect, session, url_for, send_file)
-from utils.handle_config import ConfigHandler
-from utils.handle_path import PathHandler
-from utils.handle_dataset import DatasetHandler
-from utils.handle_model import ModelHandler
-from utils.handle_status import StatusHandler
-from data_augment.augment_dataset import DatasetAugment
-from damo_yolo2.tools.demo import InferRunner
-from FastSAM2.fastsam_inference import FastFAM_Infer
-from evaluation.predict_dataset import PredictDataset
-from damo_yolo2.damo.apis import Trainer
-from damo_yolo2.damo.config.base import parse_config
+from src.controller.handle_config import ConfigHandler
+from src.controller.handle_path import PathHandler
+from src.controller.handle_dataset import DatasetHandler
+from src.controller.handle_model import ModelHandler
+from src.controller.handle_status import StatusHandler
+from src.data_augment.augment_dataset import DatasetAugment
+from src.object_detection_models.damo_yolo2.tools.demo import InferRunner
+from src.segmentation_models.FastSAM2.fastsam_inference import FastFAM_Infer
+from src.evaluation.predict_dataset import PredictDataset
+from src.object_detection_models.damo_yolo2.damo.apis import Trainer
+from src.object_detection_models.damo_yolo2.damo.config.base import parse_config
 import matplotlib.pyplot as plt
 import json
 import os
@@ -45,17 +45,17 @@ def home():
 
 @app.route("/data/datasets")
 def data():
-    return render_template("data.html")
+    return render_template("data/data.html")
 
 @app.route("/data/guide")
 def data_guide():
-    return render_template("data_guide.html")
+    return render_template("data/data_guide.html")
 
 @app.route("/review_dataset")
 def review_dataset():
     dataset_name = request.args.get("dataset_name")
     dataset_info = dataset_handler.get_info_by_name(dataset_name)
-    return render_template("dataset_overview.html", dataset_name=dataset_name, dataset_info=dataset_info)
+    return render_template("data/dataset_overview.html", dataset_name=dataset_name, dataset_info=dataset_info)
 
 @app.route("/review_model")
 def review_model():
@@ -63,7 +63,7 @@ def review_model():
     status_handler = StatusHandler(model_name)
     model_info = model_handler.get_model_info_by_name(model_name)
     model_status_info = status_handler.get_info()
-    return render_template("model_overview.html", model_name=model_name, model_info=model_info, model_status_info=model_status_info)
+    return render_template("modeling/model_overview.html", model_name=model_name, model_info=model_info, model_status_info=model_status_info)
 
 @app.route("/train_model")
 def train_model():
@@ -71,7 +71,7 @@ def train_model():
     status_handler = StatusHandler(model_name)
     model_info = model_handler.get_model_info_by_name(model_name)
     model_status_info = status_handler.get_info()
-    return render_template("train_model.html", model_name=model_name, model_info=model_info, model_status_info=model_status_info)
+    return render_template("modeling/train_model.html", model_name=model_name, model_info=model_info, model_status_info=model_status_info)
 
 @app.route("/get_training_status", methods=["POST"])
 def get_training_status():
@@ -150,13 +150,13 @@ def terminate_training():
 def upload_data():
     dataset_name = request.args.get("dataset_name")
     dataset_info = dataset_handler.get_info_by_name(dataset_name)
-    return render_template("upload_data.html", dataset_name=dataset_name, nbr_images=dataset_info['nbr_images'])
+    return render_template("data/upload_data.html", dataset_name=dataset_name, nbr_images=dataset_info['nbr_images'])
 
 @app.route("/preview_data")
 def preview_data():
     dataset_name = request.args.get("dataset_name")
     dataset_info = dataset_handler.get_info_by_name(dataset_name)
-    return render_template("dataset_image_preview.html", dataset_name=dataset_name, nbr_images=dataset_info['nbr_images'])
+    return render_template("data/dataset_image_preview.html", dataset_name=dataset_name, nbr_images=dataset_info['nbr_images'])
 
 @app.route("/data_annotation")
 def data_annotation():
@@ -164,7 +164,7 @@ def data_annotation():
     dataset_info = dataset_handler.get_info_by_name(dataset_name)
     models_dir = general_cfg.path.models_dir
     models = os.listdir(models_dir)
-    return render_template("data_annotation.html", dataset_name=dataset_name, nbr_images=dataset_info['nbr_images'], models=models, all_datasets=dataset_info['class_list'])
+    return render_template("data/data_annotation.html", dataset_name=dataset_name, nbr_images=dataset_info['nbr_images'], models=models, all_datasets=dataset_info['class_list'])
 
 @app.route("/get_model_classes", methods=['POST'])
 def get_model_classes():
@@ -225,14 +225,14 @@ def view_results():
         cv2.imwrite(os.path.join(static_results_dir, image_name), img)
         path_list.append(os.path.join(static_results_dir, image_name))
 
-    return render_template("view_results.html", path_list=path_list, average_precision=average_precision, dataset_name=dataset_name, model_name=model_name)
+    return render_template("evaluation/view_results.html", path_list=path_list, average_precision=average_precision, dataset_name=dataset_name, model_name=model_name)
 
 @app.route("/view_prediction_images", methods=['GET'])
 def view_prediction_images():
     dataset_name = request.args.get("dataset_name")
     model_name = request.args.get("model_name")
 
-    return render_template("view_prediction_images.html", dataset_name=dataset_name, model_name=model_name)
+    return render_template("evaluation/view_prediction_images.html", dataset_name=dataset_name, model_name=model_name)
 
 @app.route("/get_all_evaluations", methods=["POST", "GET"])
 def get_all_evaluations():
@@ -290,7 +290,7 @@ def upload_images():
                 os.remove(os.path.join(image_path, filename))
 
     dataset_handler.update_preparation_progress(dataset_name, 2)
-    return redirect('/upload_data?dataset_name={}'.format(dataset_name))
+    return redirect('data/upload_data?dataset_name={}'.format(dataset_name))
 
 @app.route("/upload_video", methods=["POST"])
 def upload_video():
@@ -345,7 +345,7 @@ def data_explore():
     shutil.copyfile(number_plot_path, static_number_plot_path)
     shutil.copyfile(size_plot_path, static_size_plot_path)
 
-    return render_template("explore_data.html", dataset_name=dataset_name, dataset_info=dataset_info)
+    return render_template("data/explore_data.html", dataset_name=dataset_name, dataset_info=dataset_info)
 
 @app.route("/data_augment", methods=['GET'])
 def data_augment():
@@ -353,7 +353,7 @@ def data_augment():
     dataset_info = dataset_handler.get_info_by_name(dataset_name)
     nbr_auto_annotated = dataset_info['nbr_auto_annotated']
     nbr_images = dataset_info['nbr_images']
-    return render_template("augment.html", dataset_name=dataset_name, nbr_auto_annotated=nbr_auto_annotated, nbr_images=nbr_images)
+    return render_template("data/augment.html", dataset_name=dataset_name, nbr_auto_annotated=nbr_auto_annotated, nbr_images=nbr_images)
 
 @app.route("/start_augment", methods=['POST'])
 def start_augment():
@@ -545,14 +545,14 @@ def get_all_models():
 def train():
     all_trainset = dataset_handler.get_all_trainset()
     all_testset = dataset_handler.get_all_testset()
-    return render_template("train.html", all_trainset=all_trainset, all_testset=all_testset)
+    return render_template("modeling/train.html", all_trainset=all_trainset, all_testset=all_testset)
 
 @app.route("/evaluation")
 def evaluation():
     all_testsets = dataset_handler.get_all_testset()
     models_dir = general_cfg.path.models_dir
     all_models = os.listdir(models_dir)    
-    return render_template("evaluation.html", all_testsets=all_testsets, all_models=all_models)
+    return render_template("evaluation/evaluation.html", all_testsets=all_testsets, all_models=all_models)
 
 @app.route("/start_evaluate", methods=["POST"])
 def start_evaluate():
@@ -569,7 +569,7 @@ def start_evaluate():
 def demo():
     models_dir = general_cfg.path.models_dir
     models = os.listdir(models_dir)
-    return render_template("demo.html", models=models, input_type=None, input_path=None)
+    return render_template("deployment/demo.html", models=models, input_type=None, input_path=None)
 
 @app.route("/infer_detection", methods = ['POST'])
 def infer_detection():
@@ -609,7 +609,7 @@ def upload_file():
 
             models_dir = general_cfg.path.models_dir
             models = os.listdir(models_dir)
-            return render_template("demo.html", models=models, input_type=input_type, input_name=filename)
+            return render_template("deployment/demo.html", models=models, input_type=input_type, input_name=filename)
 
 @app.route('/download_file',methods = ['GET'])
 def download_file():

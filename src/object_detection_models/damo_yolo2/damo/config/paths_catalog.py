@@ -2,7 +2,7 @@
 # Copyright (C) Alibaba Group Holding Limited. All rights reserved.
 """Centralized catalog of paths."""
 import os
-from utils.handle_config import ConfigHandler
+from src.controller.handle_config import ConfigHandler
 
 class DatasetCatalog(object):
     cfgs = ConfigHandler()

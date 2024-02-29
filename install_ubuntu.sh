@@ -1,1 +1,1 @@
-export PYTHONPATH=$PYTHONPATH:damo_yolo2:FastSAM2:.
+export PYTHONPATH=$PYTHONPATH:src/object_detection_models/damo_yolo2:src/segmentation_models/FastSAM2:.

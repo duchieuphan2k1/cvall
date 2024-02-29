@@ -1,7 +1,7 @@
 import json
 import os
 import signal
-from utils.handle_path import PathHandler
+from src.controller.handle_path import PathHandler
 
 class StatusHandler:
     def __init__(self, model_name):
