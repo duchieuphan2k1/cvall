@@ -1,0 +1,334 @@
+{% include 'header.html' %}
+<style>
+    .cvall_menu:hover {
+        background-color: #F1EFEF;
+        color: #4999D7;
+    }
+
+    .cvall_action:hover {
+        color: #4999D7 !important;
+    }
+
+    .cvall_link:hover {
+        color: #004AAD !important;
+    }
+</style>
+<div style="margin-left: 30px; padding-right: 30px;">
+    <p style="font-size: 18px; margin-top: 30px;">
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/">Home</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/evaluation"> > Evaluation</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/view_results?model_name={{model_name}}&dataset_name={{dataset_name}}"> > {{model_name}} | {{dataset_name}}</a>
+    </p>
+    <div class="row flex-nowrap" style="margin-left: 0">
+        {% include 'view_result_menu.html' %}
+        <main class="col ps-md-2 pt-2">
+            <div style="font-size: 24px; font-weight: bold; margin-top: -15px; margin-bottom: 15px;">
+                Evaluation | {{model_name}} | {{dataset_name}}
+            </div>
+            <div class="row" style="color: #004AAD;">
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-bullseye"></i> Set Confidence
+                </p>
+            </div>
+
+            <div class="" style="font-size: 13px;">
+                <div>
+                    <div><b>Average Results</b>
+                        <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i>
+                    </div>
+                    <br>
+                    <div class="row" style="margin-bottom: 30px;">
+                        <div class="chart-container col" style="position: relative; min-width: 300px; ">
+                            <canvas id="ap_50_95_chart"></canvas>
+                        </div>
+                        <div class="chart-container col" style="position: relative; height: 300px; ">
+                            <canvas id="error_distribution"></canvas>
+                        </div>
+                        <div class="chart-container col" style="position: relative; height: 300px; ">
+                            <canvas id="prediction_results"></canvas>
+                        </div>
+                        <div class="chart-container col" style="position: relative; height: 300px;">
+                        <canvas id="evaluation_model_comparison"></canvas>
+                    </div>
+                    </div>
+                </div>
+                <div>
+                    <div><b>The Classes Results of Confidence 0.5</b>
+                        <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i>
+                    </div>
+                    <br>
+                    <table id="classes_results_table" class="display" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Class Name</th>
+                                <th>Total Predict</th>
+                                <th>Total Ground Truth</th>
+                                <th>Wrong Predict</th>
+                                <th>Excessive</th>
+                                <th>Missing</th>
+                                <th>True Positive (TP)</th>
+                                <th>False Negative (FN)</th>
+                                <th>False Positive (FP)</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>plastic</td>
+                                <td>50</td>
+                                <td>60</td>
+                                <td>10</td>
+                                <td>5</td>
+                                <td>15</td>
+                                <td>35</td>
+                                <td>15</td>
+                                <td>15</td>
+                                <td>80.74</td>
+                                <td>60.26</td>
+                            </tr>
+                            <tr>
+                                <td>metal</td>
+                                <td>50</td>
+                                <td>60</td>
+                                <td>10</td>
+                                <td>5</td>
+                                <td>15</td>
+                                <td>35</td>
+                                <td>15</td>
+                                <td>15</td>
+                                <td>80.74</td>
+                                <td>60.26</td>
+                            </tr>
+                            <tr>
+                                <td>glass</td>
+                                <td>50</td>
+                                <td>60</td>
+                                <td>10</td>
+                                <td>5</td>
+                                <td>15</td>
+                                <td>35</td>
+                                <td>15</td>
+                                <td>15</td>
+                                <td>80.74</td>
+                                <td>60.26</td>
+                            </tr>
+                            <tr>
+                                <td>paper</td>
+                                <td>50</td>
+                                <td>60</td>
+                                <td>10</td>
+                                <td>5</td>
+                                <td>15</td>
+                                <td>35</td>
+                                <td>15</td>
+                                <td>15</td>
+                                <td>80.74</td>
+                                <td>60.26</td>
+                            </tr>
+                            <tr>
+                                <td>rock</td>
+                                <td>50</td>
+                                <td>60</td>
+                                <td>10</td>
+                                <td>5</td>
+                                <td>15</td>
+                                <td>35</td>
+                                <td>15</td>
+                                <td>15</td>
+                                <td>80.74</td>
+                                <td>60.26</td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script>
+    var class_i = 0;
+    $("#evaluation_detail_menu").css("background-color", "#F1EFEF");
+    new DataTable('#classes_results_table', {
+        });
+
+    const ap_50_95_chart = document.getElementById('ap_50_95_chart');
+    const error_distribution = document.getElementById('error_distribution');
+    const prediction_results = document.getElementById('prediction_results');
+    const evaluation_model_comparison = document.getElementById('evaluation_model_comparison');
+
+    new Chart(evaluation_model_comparison, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    label: 'The Damo-YOLO',
+                    data: [{
+                        x: 0,
+                        y: 0
+                    }, {
+                        x: 1,
+                        y: 10
+                    }, {
+                        x: 2,
+                        y: 5
+                    }, {
+                        x: 3,
+                        y: 5.5
+                    }],
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                },
+                {
+                    label: 'The YOLO-v5',
+                    data: [{
+                        x: 0,
+                        y: 1
+                    }, {
+                        x: 1,
+                        y: 3
+                    }, {
+                        x: 2,
+                        y: 4
+                    }, {
+                        x: 3,
+                        y: 6
+                    }],
+                    borderColor: 'rgb(255,145,77)',
+                    backgroundColor: 'rgb(255,145,77)',
+                },
+                {
+                    label: 'The YOLO-v8',
+                    data: [{
+                        x: 0,
+                        y: 5
+                    }, {
+                        x: 1,
+                        y: 2
+                    }, {
+                        x: 2,
+                        y: 1
+                    }, {
+                        x: 3,
+                        y: 7
+                    }],
+                    borderColor: 'rgb(46,180,231)',
+                    backgroundColor: 'rgb(46,180,231)',
+                }
+            ]
+        },
+
+        options: {
+            aspectRatio: 1,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Comparison of models on Aquatrash Dataset',
+                }
+
+            }
+        }
+    });
+
+    new Chart(ap_50_95_chart, {
+        type: 'bar',
+        data: {
+            labels: ['50', '55', '60', '65', '70', '75', '80', '85', '90', '95'],
+            datasets: [{
+                label: '%',
+                data: [90.25, 89.56, 90.58, 85.24, 78.52, 75.44, 90.58, 85.24, 78.52, 75.44],
+                borderWidth: 1,
+                backgroundColor: [
+                    'rgb(108,229,232)',
+                ],
+            }]
+        },
+
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'AP50-95 of The Prediction',
+                }
+
+            }
+        }
+    });
+
+    new Chart(error_distribution, {
+        type: 'doughnut',
+        data: {
+            labels: ['Wrong Prediction', 'Excessive', 'Missing'],
+            datasets: [{
+                label: 'Number of Objects',
+                data: [2000, 100, 80],
+                borderWidth: 1,
+                backgroundColor: [
+                    'rgb(45,139,186)',
+                    'rgb(108,229,232)',
+                    'rgb(65,184,213)',
+                ],
+            }]
+        },
+
+        options: {
+            // maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'The Error Distribution',
+                }
+
+            }
+        }
+    });
+
+
+
+    new Chart(prediction_results, {
+        type: 'bar',
+        data: {
+            labels: ['True', 'Wrong', 'Missing', 'Excessive'],
+            datasets: [{
+                label: 'Number of objects',
+                data: [100, 20, 10, 8],
+                borderWidth: 1,
+                backgroundColor: [
+                    'rgb(65,184,213)',
+                ],
+            }]
+        },
+
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'The Prediction Result of the Confident 0.5',
+                }
+
+            }
+        }
+    });
+
+</script>
+</div>

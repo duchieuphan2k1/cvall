@@ -5,3 +5,8 @@ backgrounds/*
 experiments/*
 *.pth
 backups
+datasets_bk
+static/demo_stuff
+static/predicted
+static/temp_results
+data/*

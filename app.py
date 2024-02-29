@@ -227,6 +227,13 @@ def view_results():
 
     return render_template("view_results.html", path_list=path_list, average_precision=average_precision, dataset_name=dataset_name, model_name=model_name)
 
+@app.route("/view_prediction_images", methods=['GET'])
+def view_prediction_images():
+    dataset_name = request.args.get("dataset_name")
+    model_name = request.args.get("model_name")
+
+    return render_template("view_prediction_images.html", dataset_name=dataset_name, model_name=model_name)
+
 @app.route("/get_all_evaluations", methods=["POST", "GET"])
 def get_all_evaluations():
     experiment_dir = general_cfg.path.evaluation_dir

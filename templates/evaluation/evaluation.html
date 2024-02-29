@@ -1,0 +1,186 @@
+{% include 'header.html' %}
+<style>
+    .cvall_menu:hover {
+        background-color: #F1EFEF;
+        color: #4999D7;
+    }
+
+    .cvall_action:hover {
+        color: #4999D7 !important;
+    }
+
+    .cvall_link:hover {
+        color: #004AAD !important;
+    }
+</style>
+<div style="margin-left: 30px; padding-right: 30px;">
+    <p style="font-size: 18px; margin-top: 30px;">
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/">Home</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/evaluation"> > Evaluation</a>
+    </p>
+    <div class="row flex-nowrap" style="margin-left: 0">
+        {% include 'evaluation_menu.html' %}
+        <main class="col ps-md-2 pt-2">
+            <div style="font-size: 24px; font-weight: bold; margin-top: -15px; margin-bottom: 15px;">
+                Evaluation
+            </div>
+            <div>
+                <div class="row">
+                    <div class="form-group row" style="margin-bottom:5px; width: 40%; font-size: 13px;">
+                        <label for="model_name" class="col-sm-4 col-form-label"><b>Choose Model</b>
+                            <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                        <div class="col-sm-8">
+                            <select class="form-control" id="model_name" style="font-size: 13px; max-width: 400px;">
+                                {% for model_name in all_models %}
+                                <option value="{{model_name}}">{{model_name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-bottom:5px; width: 40%; font-size: 13px;">
+                        <label for="dataset_name" class="col-sm-4 col-form-label"><b>Choose Dataset</b>
+                            <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i></label>
+                        <div class="col-sm-8">
+                            <select class="form-control" id="dataset_name" style="font-size: 13px; max-width: 400px;">
+                                {% for testset in all_testsets %}
+                                <option value="{{testset}}">{{testset}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <a href="#" style="width: 200px; border-radius: 15px; font-size: 13px; width: 200px; margin-right: 10px; margin-left: 10px;" id="evaluation_button" onclick="start_evaluation()"
+                        class="btn btn-primary">Start Evaluation</a>
+                    <a style="display: none; width: 200px!important; border-radius: 15px; font-size: 13px; width: 200px; margin-right: 10px; margin-left: 10px;" href="#" id="view_detail_button"
+                        class="btn btn-primary">View Results</a>
+                </div>
+                <br>
+                <div id="evaluation_tracking" style="display: none; font-size: 13px;">
+                    <strong id="evaluation_text">
+                        Evaluation is in progress ... 
+                    </strong>
+                    <div class="progress">
+                        <div id="evaluation_bar" class="progress-bar progress-bar-striped progress-bar-animated"
+                            role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0"
+                            aria-valuemax="100">0%
+                        </div>
+                    </div>
+                    <br>
+                </div>
+
+                <div class="text-center" style="font-size: 15px;">
+                    <h5>Evaluation History</h5>
+                </div>
+
+                <table id="evaluation_table" class="display" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Model Name</th>
+                            <th>Dataset Name</th>
+                            <th>AP50</th>
+                            <th>AP75</th>
+                            <th>mAP</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div>
+<script>
+    $("#evaluation_menu").css("background-color", "#F1EFEF");
+    // $(document).ready(function () {
+    //     $('#evaluation_table').DataTable();
+    // });
+    $(document).ready(function () {
+        fetch('/get_all_evaluations').then(response => {
+            return response.json();
+        }).then(results => {
+            console.log(results);
+            table = $('#evaluation_table').DataTable({
+                "data": results,
+                "columns": [
+                    { "data": "model_name" },
+                    { "data": "dataset_name" },
+                    { "data": "avg_precision" },
+                    { "data": "avg_precision" },
+                    { "data": "avg_precision" },
+                    { "": null }
+                ],
+                "columnDefs": [
+                    {
+                        targets: -1,
+                        "searchable": false,
+                        "orderable": false,
+                        render: function (data, type, row, meta) {
+                            console.log(row['row_id']);
+                            start_div = "<div class='row'>"
+                            review_button = '<div style="padding: 0px" class="col-auto"><a style="" class="btn btn-info" href="/view_results?model_name=' + row['model_name'] + '&dataset_name=' + row['dataset_name'] + '"><i class="fas fa-search"></i></a></div>'
+                            delete_button = '<div style="" class="col-auto"><form style="" action="delete_evaluation" method="POST"><input style="display:none" name="dl_dataset_name" value="' + row['dataset_name'] + '"></input><button style="" name="dl_model_name" type="submit" class="btn btn-danger dl_evaluation" value="' + row['model_name'] + '""><i class="far fa-trash-alt"></i></button></form></div>';
+                            end_div = "</div>"
+                            return start_div + review_button + delete_button + end_div;
+                        }
+                    }
+                ]
+            });
+        });
+    });
+    var status_interval = null;
+    var done_evaluation = false;
+    function get_progress() {
+        $.ajax({
+            type: 'POST',
+            url: "{{url_for('get_evaluation_progress')}}",
+            data: {
+                dataset_name: $('#dataset_name').val(),
+                model_name: $('#model_name').val()
+            },
+            success: function (resultData) {
+                console.log(resultData[0]);
+                console.log('===');
+                $('#evaluation_bar').attr('aria-valuenow', resultData[0]).css('width', resultData[0] + '%').text(resultData[0] + '%');
+                if (resultData[0] == 100) {
+                    clearInterval(status_interval);
+                    if (!done_evaluation) {
+                        $("#evaluation_text").text("Done Evaluation!")
+                        console.log("===");
+                    }
+                    done_evaluation = true;
+                }
+            }
+        });
+    }
+    function start_evaluation() {
+        model_name = $("#model_name").val();
+        dataset_name = $("#dataset_name").val();
+        status_interval = setInterval(get_progress, 2000);
+        $("#evaluation_action").css("display", 'none');
+        $("#evaluation_tracking").css("display", 'block');
+
+        $("#evaluation_button").css("display", 'none');
+        $("#view_detail_button").css("display", 'block');
+        $("#view_detail_button").addClass("disabled");
+        $("#view_detail_button").attr("href", "/view_results?model_name=" + model_name + "&dataset_name=" + dataset_name);
+
+        $.ajax({
+            url: '/start_evaluate',
+            type: 'POST',
+            data: {
+                model_name: model_name,
+                dataset_name: dataset_name
+            },
+            success: function (data) {
+                console.log(data);
+                $("#view_detail_button").removeClass("disabled");
+            }
+        });
+    }
+
+</script>
+
+</div>

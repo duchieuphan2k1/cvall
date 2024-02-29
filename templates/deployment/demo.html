@@ -1,0 +1,198 @@
+{% include 'header.html' %}
+<style>
+    .cvall_menu:hover {
+        background-color: #F1EFEF;
+        color: #4999D7;
+    }
+
+    .cvall_action:hover {
+        color: #4999D7 !important;
+    }
+
+    .cvall_link:hover {
+        color: #004AAD !important;
+    }
+</style>
+<div style="margin-left: 30px; padding-right: 30px;">
+    <p style="font-size: 18px; margin-top: 30px;">
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/">Home</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/demo"> > Deployment</a>
+    </p>
+    <div class="row flex-nowrap" style="margin-left: 0">
+        {% include 'deploy_menu.html' %}
+        <main class="col ps-md-2 pt-2">
+            <div style="font-size: 24px; font-weight: bold; margin-top: -15px; margin-bottom: 15px;">
+                Deployment
+            </div>
+            <div class="row" style="color: #004AAD;">
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-laptop-code"></i> New Deployment
+                </p>
+            </div>
+
+            <div class="" style="font-size: 13px;">
+
+                <div class="card text-center">
+                    <div class="card-header">
+                        Select your AI model, and enjoy!
+                    </div>
+                    <div class="card-body row">
+
+                        <div id="choose_img" style="width: 50%; ">
+                            {% if input_type is not none %}
+                            <input id="input_type" type="text" style="display: none;" value="{{input_type}}">
+                            <input id="input_name" type="text" style="display: none;" value="{{input_name}}">
+                            {% if input_type=="video" %}
+                            <video style="width: 100%" controls="controls">
+                                <source src="{{url_for('static', filename='demo_stuff/' + input_name)}}"
+                                    type="video/mp4" />
+                            </video>
+                            {% endif %}
+                            {% if input_type=="image" %}
+                            <img style="width: 100%" src="{{url_for('static', filename='demo_stuff/' + input_name)}}"
+                                alt="">
+                            {% endif %}
+                            {% endif %}
+                            <hr>
+                            <div class="d-flex align-items-center justify-content-center">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="segment_checkbox" value="1">
+                                    <label class="form-check-label" for="segment_checkbox">Segment Objects</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="tracking_checkbox" value="1">
+                                    <label class="form-check-label" for="tracking_checkbox">Tracking Objects</label>
+                                </div>
+                            </div>
+                            <br>
+                            <label for="model_name">Choose your detection model</label>
+                            <select id="model_name" class="form-select" aria-label="">
+                                {% for model_name in models: %}
+                                <option value="{{model_name}}">{{model_name}}</option>
+                                {% endfor %}
+                            </select>
+                            <br>
+                            <div class="row" style="margin-left: 10%; margin-right: 10%;">
+                                <div class="form-check" style="width: 45%; margin-right: 5%">
+                                    <input oninput="set_input()" class="form-check-input" type="radio"
+                                        name="flexRadioDefault" id="upload_choice" checked>
+                                    <label class="form-check-label" for="upload_choice">
+                                        Upload file to inference
+                                    </label>
+                                </div>
+                                <div class="form-check" style="width: 45%; margin-left: 5%;">
+                                    <input oninput="set_input()" class="form-check-input" type="radio"
+                                        name="flexRadioDefault" id="cam_choice">
+                                    <label class="form-check-label" for="cam_choice">
+                                        Connect to an IP Camera
+                                    </label>
+                                </div>
+                            </div>
+                            <br>
+
+                            <div id="upload_form">
+                                <form action="/upload_file" method="post" enctype="multipart/form-data">
+                                    <label for="file">Upload File (Video [mp4, avi] / Image [jpg, jpeg, png,
+                                        bmp])</label>
+                                    <input class="form-control" type="file" name="file" id="file"
+                                        onchange="form.submit()">
+                                </form>
+                                <br>
+                                <button id="inference_button" onclick="inference()" style="width: 50%;"
+                                    class="btn btn-success">Run
+                                    Inference</button>
+                            </div>
+
+                            <div id="camera_action">
+                                <div class="mb-3">
+                                    <label for="camera_ip" class="form-label">Camera IP</label>
+                                    <input type="password" value="127.0.0.52" class="form-control" id="camera_ip"
+                                        aria-describedby="camera_ip">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="camera_username" class="form-label">Camera Username</label>
+                                    <input type="password" value="admin" class="form-control" id="camera_username"
+                                        aria-describedby="camera_username">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="camera_password" class="form-label">Camera Password</label>
+                                    <input type="password" value="123456" class="form-control" id="camera_password">
+                                </div>
+
+                                <button id="camera_button" disabled onclick="connect_camera()" style="width: 50%;"
+                                    class="btn btn-success">Connect and Inference</button>
+                            </div>
+                            <br>
+                        </div>
+                        <div id="predicted_output" style="width: 50%; ">
+                            <hr>
+                            <div id="predicted_action" style="display: none;">
+                                <a type="button" id="download_output" class="btn btn-primary"
+                                    style="width: 200px;">Download
+                                    Output</a>
+                                <button class="btn btn-warning" style="width: 200px;">Get Model API</button>
+                                <button class="btn btn-info" style="width: 200px;">Export Model Module</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    $("#deploy_overview_menu").css("background-color", "#F1EFEF");
+    $("#camera_action").hide();
+    $("#upload_form").show();
+    function set_input() {
+        if ($("#upload_choice").prop('checked') == true) {
+            $("#camera_action").hide(200);
+            $("#upload_form").show(200);
+        }
+        else {
+            $("#upload_form").hide(200);
+            $("#camera_action").show(200);
+        }
+    }
+
+    function inference() {
+        var input_type = $('#input_type').val();
+        var input_name = $('#input_name').val();
+        var model_name = $('#model_name').val();
+        var segment = 0
+        var tracking = 0
+        if ($("#segment_checkbox").prop('checked') == true) {
+            segment = 1
+        }
+
+        if ($("#tracking_checkbox").prop('checked') == true) {
+            tracking = 1
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "{{url_for('infer_detection')}}",
+            data: {
+                input_type: input_type,
+                input_name: input_name,
+                model_name: model_name,
+                segment: segment,
+                tracking: tracking
+            },
+            success: function (resultData) {
+                console.log(resultData);
+                $("#out_input").remove();
+                if (input_type == "video") {
+                    $("#predicted_output").prepend('<video id="out_input" style="width: 100%" controls="controls"><source src="static/predicted/out_' + input_name + "?" + new Date().getTime() + '" type="video/mp4" /></video>')
+                } else {
+                    $("#predicted_output").prepend('<img id="out_input" style="width: 100%" src="static/predicted/' + input_name + "?" + new Date().getTime() + '" alt="">')
+                }
+                $("#predicted_action").css('display', 'block');
+                $("#download_output").attr('href', '/download_file?file_name=' + input_name)
+            }
+        });
+    }
+</script>
+</div>

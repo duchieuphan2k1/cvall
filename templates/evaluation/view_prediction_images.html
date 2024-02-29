@@ -1,0 +1,294 @@
+{% include 'header.html' %}
+<style>
+    .cvall_menu:hover {
+        background-color: #F1EFEF;
+        color: #4999D7;
+    }
+
+    .cvall_action:hover {
+        color: #4999D7 !important;
+    }
+
+    .cvall_link:hover {
+        color: #004AAD !important;
+    }
+</style>
+<div style="margin-left: 30px; padding-right: 30px;">
+    <p style="font-size: 18px; margin-top: 30px;">
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/">Home</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link" href="/evaluation"> > Evaluation</a>
+        <a style="text-decoration: none; color: #4999D7;" class="cvall_link"
+            href="/view_results?model_name={{model_name}}&dataset_name={{dataset_name}}"> > {{model_name}} |
+            {{dataset_name}}</a>
+    </p>
+    <div class="row flex-nowrap" style="margin-left: 0">
+        {% include 'view_result_menu.html' %}
+        <main class="col ps-md-2 pt-2">
+            <div style="font-size: 24px; font-weight: bold; margin-top: -15px; margin-bottom: 15px;">
+                Evaluation | {{model_name}} | {{dataset_name}}
+            </div>
+            <div class="row" style="color: #004AAD;">
+                <p class="col-auto cvall_action" type="button">
+                    <i class="fas fa-bullseye"></i> Set Confidence
+                </p>
+            </div>
+
+            <div class="" style="font-size: 13px;">
+                <div><b>Error Image Analysis of Confidence 0.5</b>
+                    <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i>
+                </div>
+                <br>
+                <div>
+                    <div><b>True Predict</b>
+                        <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                    </div>
+                    <div><a style="text-decoration: none;" href="">Load More ...</a>
+                    </div>
+                </div>
+                <br><br>
+                <div>
+                    <div><b>Wrong Predict</b>
+                        <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                    </div>
+                    <div><a style="text-decoration: none;" href="">Load More ...</a>
+                    </div>
+                </div>
+                <br><br>
+                <div>
+                    <div><b>Missing</b>
+                        <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                    </div>
+                    <div><a style="text-decoration: none;" href="">Load More ...</a>
+                    </div>
+                </div>
+                <br><br>
+                <div>
+                    <div><b>Excessive</b>
+                        <i style="color: #1F5FB7;" type="button" class="fas fa-info-circle"></i>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                        <div class="col-auto row" style="width: 20%;">
+                            <p style="font-size: 11px; margin-bottom: 0px;">image_demo_1.jpg (1200x758)</p>
+                            <img style=""
+                                src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="">
+                            <input class="form-check-input col-auto" type="checkbox" value=""
+                                style="margin-left: -45px; margin-top: 5px; height: 25px;">
+                            <!-- <i class="fas fa-times col-auto" style="margin-left: -45px; margin-top: 5px; color: red;" type="button"></i> -->
+                            <p style="font-size: 11px;">15th Jan 2024, 17:17:43.123</p>
+                        </div>
+                    </div>
+                    <div><a style="text-decoration: none;" href="">Load More ...</a>
+                    </div>
+                </div>
+                <br><br>
+                
+            </div>
+        </main>
+    </div>
+</div>
+<script>
+    var class_i = 0;
+    $("#evaluation_prediction_images").css("background-color", "#F1EFEF");
+</script>
+</div>
